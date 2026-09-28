@@ -222,7 +222,7 @@ body.stage-only .stage { outline: none; }
 /* Record mode hides practice helpers. */
 body.record .practice-only { display: none; }
 body.record #panel { background: #FBF4F2; }
-/* No outline while recording: a selection box a pixel too big would capture it. */
+/* No outline while recording: a selection box a pixel too big would capture it.
+   The light gray page around the stage still shows where the stage ends. */
 body.record .stage { outline: none; }
-body.record #stage-wrap { background: var(--bg-behind, #F5F1E8); }
 body.record #mode-seg button[data-mode="record"] { background: #b91c1c; border-color: #b91c1c; }
