@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Side by Side Scripture mark</title>
+<!--
+  Channel mark, drawn in the stage's Vellum colors.
+  ?v=a (monogram) or ?v=b (two columns), &size=150 (watermark) or 800 (profile picture),
+  &shape=circle for the profile picture (YouTube crops it to a circle).
+  Rendered to PNG by branding/render.sh.
+-->
+<style>
+@font-face { font-family: "Source Serif 4"; src: url(../fonts/source-serif-4-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+html, body { margin: 0; background: transparent; }
+svg { display: block; }
+</style>
+</head>
+<body>
+<script>
+const p = new URLSearchParams(location.search);
+const v = p.get("v") || "a";
+const size = +(p.get("size") || 150);
+const circle = p.get("shape") === "circle";
+const paper = "#F5F1E8", main = "#14110D", accent = "#6E2419", rule = "#CFC4B0";
+
+// Drawn on a 100×100 grid, scaled to `size`.
+const frame = circle
+  ? `<rect width="100" height="100" fill="${paper}"/><circle cx="50" cy="50" r="46" fill="none" stroke="${accent}" stroke-width="5"/>`
+  : `<rect x="3" y="3" width="94" height="94" rx="16" fill="${paper}" stroke="${accent}" stroke-width="6"/>`;
+const marks = {
+  // Two serif S's side by side, split by a rule, like the Full video layout.
+  a: `${frame}
+      <text x="29" y="68" font-family="Source Serif 4, Georgia, serif" font-weight="600" font-size="52" fill="${main}" text-anchor="middle">S</text>
+      <line x1="50" y1="24" x2="50" y2="76" stroke="${accent}" stroke-width="3.5" stroke-linecap="round"/>
+      <text x="71" y="68" font-family="Source Serif 4, Georgia, serif" font-weight="600" font-size="52" fill="${accent}" text-anchor="middle">S</text>`,
+  // Two columns of text lines side by side.
+  b: `${frame}
+      ${[26, 38, 50, 62, 74].map((y, i) => `<line x1="18" y1="${y}" x2="${i === 4 ? 34 : 44}" y2="${y}" stroke="${main}" stroke-width="6" stroke-linecap="round"/>`).join("")}
+      <line x1="50" y1="20" x2="50" y2="80" stroke="${rule}" stroke-width="2.5"/>
+      ${[26, 38, 50, 62, 74].map((y, i) => `<line x1="57" y1="${y}" x2="${i === 4 ? 70 : 82}" y2="${y}" stroke="${accent}" stroke-width="6" stroke-linecap="round"/>`).join("")}`,
+};
+document.body.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 100 100">${marks[v]}</svg>`;
+</script>
+</body>
+</html>
