@@ -73,6 +73,7 @@ function parseUsfm(file) {
     .replace(/\\f\s[\s\S]*?\\f\*/g, "") // footnotes
     .replace(/\\fe\s[\s\S]*?\\fe\*/g, "")
     .replace(/\\x\s[\s\S]*?\\x\*/g, "") // cross references
+    .replace(/\\\+?wj\*/g, RED_END).replace(/\\\+?wj\s?/g, RED_START) // words of Jesus
     .replace(/\\\+?w\s([^|\\]*?)(?:\|[^\\]*?)?\\\+?w\*/g, "$1"); // \w word|strong="..."\w*
 
   const verses = new Map();
@@ -88,7 +89,7 @@ function parseUsfm(file) {
     if (c) { ch = +c[1]; cur = null; continue; }
     const h = line.match(headingLine);
     if (h) {
-      if (ch) pendingHeading = cleanInline(h[2]);
+      if (ch) pendingHeading = cleanInline(h[2]).replace(RED_ANY, "");
       continue;
     }
     if (skip.test(line)) continue;
@@ -102,7 +103,14 @@ function parseUsfm(file) {
       if (pendingHeading) { headings.set(cur, pendingHeading); pendingHeading = null; }
     }
   }
-  for (const [k, v] of verses) verses.set(k, cleanInline(v));
+  // A words-of-Jesus span can run across verses: close it at each verse end, reopen at the next start.
+  let open = false;
+  for (const [k, v] of verses) {
+    let t = (open ? RED_START : "") + v;
+    for (const ch of t) if (ch === RED_START) open = true; else if (ch === RED_END) open = false;
+    if (open) t += RED_END;
+    verses.set(k, cleanInline(t));
+  }
   return { verses, headings };
 }
 
@@ -146,6 +154,74 @@ function loadHeadings() {
   return { label: "none", map: new Map() };
 }
 
+// Berean Standard Bible verses, used to carry red letters to the Majority Standard Bible.
+function loadRedSource() {
+  const dir = path.join(RAW, "bsb/bsb_usfm");
+  const map = new Map();
+  if (!fs.existsSync(dir)) return map;
+  for (const [code] of BOOKS) {
+    const f = path.join(dir, `${code}.usfm`);
+    if (!fs.existsSync(f)) continue;
+    for (const [k, v] of parseUsfm(f).verses) map.set(`${code} ${k}`, v);
+  }
+  return map;
+}
+
+// ---------- red letter ----------
+// Words of Jesus travel through parsing as two private characters, then become [start, end) ranges.
+const RED_START = "\u0001", RED_END = "\u0002", RED_ANY = /[\u0001\u0002]/g;
+
+// Removes the markers and returns { text, spans }. Spans never start or end on a space.
+function extractRed(t) {
+  let text = "", red = false, spans = [], start = -1;
+  for (const ch of t) {
+    if (ch === RED_START) { red = true; continue; }
+    if (ch === RED_END) { red = false; continue; }
+    if (ch === " " && (text === "" || text.endsWith(" "))) continue; // markers can leave double spaces
+    if (red && ch !== " " && start < 0) start = text.length;
+    if (!red && start >= 0) { spans.push([start, text.trimEnd().length]); start = -1; }
+    text += ch;
+  }
+  if (start >= 0) spans.push([start, text.trimEnd().length]);
+  text = text.trimEnd();
+  spans = spans.filter(([a, b]) => b > a);
+  return { text, spans };
+}
+const redChars = (spans) => spans.reduce((n, [a, b]) => n + b - a, 0);
+
+// Carries red from a marked text to a near-identical unmarked one (Berean Standard Bible -> Majority
+// Standard Bible) by matching words. Returns { spans, coverage } where coverage is the share of the
+// target's words that matched a source word.
+function transferRed(src, srcSpans, dst) {
+  const tok = (text) => [...text.matchAll(/\S+/g)].map((m) => ({ s: m.index, e: m.index + m[0].length, k: m[0].toLowerCase().replace(/[^a-z0-9]/g, "") || m[0] }));
+  const A = tok(src), B = tok(dst);
+  for (const t of A) t.red = srcSpans.some(([a, b]) => Math.min(b, t.e) - Math.max(a, t.s) >= (t.e - t.s) / 2);
+  // Longest common subsequence of words.
+  const L = Array.from({ length: A.length + 1 }, () => new Int16Array(B.length + 1));
+  for (let i = A.length - 1; i >= 0; i--) for (let j = B.length - 1; j >= 0; j--)
+    L[i][j] = A[i].k === B[j].k ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  let i = 0, j = 0, matched = 0;
+  while (i < A.length && j < B.length) {
+    if (A[i].k === B[j].k) { B[j].red = A[i].red; B[j].m = true; matched++; i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  // Unmatched words take red only when the matched words on both sides are red.
+  const firstRed = A[0]?.red, lastRed = A.at(-1)?.red;
+  for (let k = 0; k < B.length; k++) {
+    if (B[k].m) continue;
+    let p = k - 1; while (p >= 0 && !B[p].m) p--;
+    let n = k + 1; while (n < B.length && !B[n].m) n++;
+    B[k].red = (p >= 0 ? B[p].red : firstRed) && (n < B.length ? B[n].red : lastRed);
+  }
+  const spans = [];
+  for (let k = 0; k < B.length; k++) {
+    if (!B[k].red) continue;
+    const a = k; while (k + 1 < B.length && B[k + 1].red) k++;
+    spans.push([B[a].s, B[k].e]);
+  }
+  return { spans, coverage: B.length ? matched / B.length : 1 };
+}
+
 // ---------- text rules ----------
 
 function stripBlb(s) {
@@ -171,6 +247,8 @@ for (const row of rows) {
   log(`  ${CONFIG.names[row].padEnd(24)} ${r ? `${r.label} (${r.map.size} verses incl. Old Testament)` : "MISSING — row will be empty"}`);
 }
 const headingSrc = loadHeadings();
+const redSource = loadRedSource();
+const redLog = { transferred: 0, low: [], fromKjv: [] };
 log(`  ${"Section headings".padEnd(24)} ${headingSrc.label} (${headingSrc.map.size} headings)`);
 
 // Heading overrides
@@ -225,7 +303,26 @@ for (const [code, name] of BOOKS) {
         if (/^\[\s*\]$/.test(t)) t = ""; // eBible placeholder for an omitted verse
         t = norm(t.replace(/¶/g, "")); // KJV paragraph marks (formatting, not wording)
         if (row === "blb") t = stripBlb(t);
-        verse[row] = t;
+        const { text, spans } = extractRed(t);
+        verse[row] = text;
+        if (spans.length) (verse.red = verse.red || {})[row] = spans;
+      }
+      // The Majority Standard Bible has no red-letter markup: carry it over from the Berean Standard Bible.
+      const mainRow = CONFIG.readRow;
+      if (verse[mainRow] && !verse.red?.[mainRow]) {
+        const bsb = redSource.get(ref);
+        if (bsb) {
+          const src = extractRed(norm(bsb));
+          if (src.spans.length) {
+            const r = transferRed(src.text, src.spans, verse[mainRow]);
+            if (r.spans.length) { (verse.red = verse.red || {})[mainRow] = r.spans; redLog.transferred++; }
+            if (r.coverage < 0.8) redLog.low.push(`${ref} (${Math.round(r.coverage * 100)}% of words matched)`);
+          }
+        } else if (verse.red?.kjv && redChars(verse.red.kjv) >= verse.kjv.length * 0.8) {
+          // Not in the Berean Standard Bible (e.g. Matthew 17:21): the King James Version has it all in red.
+          (verse.red = verse.red || {})[mainRow] = [[0, verse[mainRow].length]];
+          redLog.fromKjv.push(ref);
+        }
       }
       const h = headings.get(ref);
       if (h) verse.heading = h;
@@ -278,6 +375,18 @@ for (const type of ["missing", "bracketed", "long"]) {
   if (flagged[type].length > 40) log(`    ... ${flagged[type].length - 40} more in data/build-report.txt`);
 }
 log(`  same-as-main verses: ${flagged["same-as-main"]?.length || 0} (not listed; used to collapse rows)`);
+log("");
+
+log("RED LETTER (words of Jesus)");
+for (const row of rows) {
+  let n = 0;
+  for (const code of Object.keys(data)) for (const list of Object.values(data[code].chapters)) for (const v of list) if (v.red?.[row]) n++;
+  log(`  ${CONFIG.names[row].padEnd(24)} ${n ? `${n} verses` : "no markup in source"}`);
+}
+log(`  ${CONFIG.names[CONFIG.readRow]}: ${redLog.transferred} verses matched word by word from the Berean Standard Bible`);
+log(`  Taken whole from the King James Version (not in the Berean Standard Bible): ${redLog.fromKjv.join(", ") || "none"}`);
+log(`  Review these (wording differs a lot from the Berean Standard Bible): ${redLog.low.length}`);
+redLog.low.forEach((x) => log(`    ${x}`));
 log("");
 
 log("TOP 20 VERSES BY COMBINED LENGTH (layout stress list)");

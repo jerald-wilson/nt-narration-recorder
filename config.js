@@ -25,6 +25,10 @@ const CONFIG = {
     bbe: "Critical Text",
   },
 
+  // Red letter: words of Jesus in red, for these rows. Only the Majority Standard Bible and the
+  // King James Version have the data; the other two sources don't mark who is speaking.
+  redLetter: ["msb", "kjv"],
+
   // Berean Literal Bible marks plural "you" with ⁺ and added words with [brackets].
   // false = strip both (default); true = keep the original markers. Rebuild after changing.
   blbKeepMarkers: false,

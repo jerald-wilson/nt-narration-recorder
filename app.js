@@ -140,7 +140,14 @@ function labelHTML(r) {
 function rowHTML(r, v, cls) {
   const t = v[r];
   return `<section class="row ${cls}"><div class="label">${labelHTML(r)}</div>` +
-    (t ? `<p class="text">${esc(t)}</p>` : `<p class="text absent">Not in this translation</p>`) + `</section>`;
+    (t ? `<p class="text">${redLetterHTML(t, C.redLetter.includes(r) && v.red?.[r])}</p>` : `<p class="text absent">Not in this translation</p>`) + `</section>`;
+}
+// Words of Jesus (character ranges from the data) wrapped in red.
+function redLetterHTML(t, spans) {
+  if (!spans) return esc(t);
+  let out = "", at = 0;
+  for (const [a, b] of spans) out += esc(t.slice(at, a)) + `<span class="jw">${esc(t.slice(a, b))}</span>`, at = b;
+  return out + esc(t.slice(at));
 }
 function stageParts(v) {
   const main = C.readRow;

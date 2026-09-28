@@ -1,4 +1,4 @@
-NT Narration Recorder — data build 2026-09-28T12:55:45.919Z
+NT Narration Recorder — data build 2026-09-28T22:08:48.893Z
 
 SOURCES
   Majority Standard Bible  msb.txt (7957 verses incl. Old Testament)
@@ -8,7 +8,7 @@ SOURCES
   Section headings         Berean Standard Bible (993 headings)
   Heading overrides        2 from data/heading-overrides.json
 
-WROTE data/nt.json — 27 books, 260 chapters, 7960 verses (4.3 MB)
+WROTE data/nt.json — 27 books, 260 chapters, 7960 verses (4.4 MB)
 
 FLAGS
   bracketed:bbe            12
@@ -215,6 +215,62 @@ FLAGS
     REV 21:8 (long)
     ... 89 more in data/build-report.txt
   same-as-main verses: 80 (not listed; used to collapse rows)
+
+RED LETTER (words of Jesus)
+  Majority Standard Bible  2050 verses
+  King James Version       2028 verses
+  Berean Literal Bible     no markup in source
+  Bible in Basic English   no markup in source
+  Majority Standard Bible: 2043 verses matched word by word from the Berean Standard Bible
+  Taken whole from the King James Version (not in the Berean Standard Bible): MAT 17:21, MAT 18:11, MAT 23:14, MRK 7:16, MRK 9:44, MRK 9:46, MRK 11:26
+  Review these (wording differs a lot from the Berean Standard Bible): 47
+    MAT 5:44 (48% of words matched)
+    MAT 6:13 (50% of words matched)
+    MAT 11:15 (78% of words matched)
+    MAT 13:9 (78% of words matched)
+    MAT 13:51 (69% of words matched)
+    MAT 15:8 (61% of words matched)
+    MAT 19:9 (68% of words matched)
+    MAT 20:7 (72% of words matched)
+    MAT 20:16 (60% of words matched)
+    MAT 20:22 (69% of words matched)
+    MAT 20:23 (75% of words matched)
+    MAT 23:13 (44% of words matched)
+    MAT 25:2 (78% of words matched)
+    MAT 25:13 (68% of words matched)
+    MAT 28:9 (65% of words matched)
+    MRK 3:33 (67% of words matched)
+    MRK 6:11 (54% of words matched)
+    MRK 7:8 (48% of words matched)
+    MRK 8:26 (75% of words matched)
+    MRK 8:36 (69% of words matched)
+    MRK 9:40 (78% of words matched)
+    MRK 9:49 (47% of words matched)
+    MRK 10:34 (70% of words matched)
+    MRK 10:49 (78% of words matched)
+    MRK 12:4 (73% of words matched)
+    LUK 4:4 (68% of words matched)
+    LUK 4:8 (79% of words matched)
+    LUK 5:38 (67% of words matched)
+    LUK 8:45 (68% of words matched)
+    LUK 8:54 (76% of words matched)
+    LUK 10:15 (79% of words matched)
+    LUK 11:2 (53% of words matched)
+    LUK 11:4 (74% of words matched)
+    LUK 11:11 (61% of words matched)
+    LUK 11:44 (76% of words matched)
+    LUK 12:31 (73% of words matched)
+    LUK 14:22 (75% of words matched)
+    LUK 14:24 (67% of words matched)
+    LUK 22:31 (75% of words matched)
+    LUK 22:68 (73% of words matched)
+    LUK 24:46 (79% of words matched)
+    JHN 3:13 (75% of words matched)
+    JHN 3:15 (71% of words matched)
+    JHN 8:10 (67% of words matched)
+    JHN 10:26 (65% of words matched)
+    JHN 11:41 (77% of words matched)
+    JHN 16:16 (67% of words matched)
 
 TOP 20 VERSES BY COMBINED LENGTH (layout stress list)
    1. Revelation 20:4        1478 chars

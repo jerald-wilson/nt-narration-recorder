@@ -12,6 +12,7 @@
   --label: #3F362E;
   --accent: #6E2419;
   --rule: #CFC4B0;
+  --jesus: #9B1C1C; /* red letter; 7.2:1 on --bg */
 }
 
 /* ---------- stage geometry (tune once after test uploads; never per platform) ---------- */
@@ -80,6 +81,7 @@ body {
 .stage .text.absent { color: var(--label); font-family: var(--sans); font-size: var(--l) !important; }
 
 .stage .row.main .label { color: var(--accent); }
+.stage .jw { color: var(--jesus); }
 .stage .row.main .text { font-size: var(--m); color: var(--main); }
 .stage .row.comp .text { font-size: var(--c); color: var(--sub); }
 .stage .row.comp, .stage .row.same {
