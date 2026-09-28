@@ -229,8 +229,34 @@ function render() {
   $("#fit-info").className = "hint" + (info.fits ? "" : " warn");
 
   renderPanel(v);
+  checkCapture();
   store.set("pos", { book: state.book, ch: state.ch, v: v.v, format: state.format, mode: state.mode });
 }
+
+// ---------- capture check: browser zoom, stage cut off, recorded size ----------
+const TARGET = { section: [1080, 1920], full: [1920, 1080] };
+function checkCapture() {
+  const el = $("#capture");
+  const problems = [];
+  // Browser zoom scales devicePixelRatio. Macs are 1x or 2x (Retina), so anything else means zoom.
+  const dpr = window.devicePixelRatio || 1;
+  if (dpr !== 1 && dpr !== 2) problems.push(`Browser zoom is about ${Math.round((dpr / 2) * 100)}%. Press <b>Cmd+0</b> to reset it to 100% before recording.`);
+  const r = stage.getBoundingClientRect();
+  const cutBottom = Math.ceil(r.bottom - window.innerHeight), cutRight = Math.ceil(r.right - window.innerWidth);
+  if (cutBottom > 0 || cutRight > 0) {
+    const where = [cutBottom > 0 && `bottom by ${cutBottom}px`, cutRight > 0 && `right by ${cutRight}px`].filter(Boolean).join(" and ");
+    problems.push(`The stage is cut off at the ${where}. Make the window bigger or go full screen (<b>Ctrl+Cmd+F</b>).`);
+  }
+  const w = Math.round(stage.offsetWidth * dpr), h = Math.round(stage.offsetHeight * dpr);
+  const [tw, th] = TARGET[state.format];
+  const sizeOk = w === tw && h === th;
+  if (!sizeOk && !problems.length) problems.push(`The stage will record at ${w} × ${h}, not ${tw} × ${th}. Either the browser zoom is 50% (press <b>Cmd+0</b>) or this window is on a display that isn't Retina; move it to the iMac's built-in screen.`);
+  el.className = "capture" + (problems.length ? " bad" : "");
+  el.innerHTML = problems.length
+    ? problems.map((p) => `<p>${p}</p>`).join("") + (sizeOk ? "" : `<p>Records at ${w} × ${h} right now (should be ${tw} × ${th}).</p>`)
+    : `Ready to record: stage records at ${w} × ${h}.`;
+}
+window.addEventListener("resize", () => { if (DB) checkCapture(); });
 
 // ---------- panel ----------
 function renderPanel(v) {
