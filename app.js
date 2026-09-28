@@ -260,6 +260,7 @@ function checkCapture() {
   el.innerHTML = problems.length
     ? problems.map((p) => `<p>${p}</p>`).join("") + (sizeOk ? "" : `<p>Records at ${w} × ${h} right now (should be ${tw} × ${th}).</p>`)
     : `Ready to record: stage records at ${w} × ${h}.`;
+  if (state.mode === "record") el.innerHTML += `<p class="stop-tip">Stop the screen recording: <b>Cmd+Ctrl+Esc</b></p>`;
 }
 window.addEventListener("resize", () => { if (DB) checkCapture(); });
 
