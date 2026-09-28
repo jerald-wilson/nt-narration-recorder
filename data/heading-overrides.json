@@ -1,0 +1,12 @@
+{
+  "_help": [
+    "Section headings are pulled automatically (Berean Standard Bible headings, which the Majority Standard Bible shares).",
+    "Override any of them here, then run: node scripts/build-data.js",
+    "Key = BOOK CHAPTER:VERSE using the book codes in data/nt.json (MAT MRK LUK JHN ACT ROM 1CO 2CO GAL EPH PHP COL 1TH 2TH 1TI 2TI TIT PHM HEB JAS 1PE 2PE 1JN 2JN 3JN JUD REV).",
+    "A string sets or renames the heading that starts a section at that verse (it can also add a new section).",
+    "null removes the section break at that verse, so it joins the section before it.",
+    "Example: \"MRK 4:1\": \"The Parable of the Sower\"   or   \"MRK 4:21\": null"
+  ],
+  "ROM 14:24": "Doxology",
+  "ROM 16:25": null
+}

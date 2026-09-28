@@ -1,0 +1,208 @@
+/* ---------- fonts (self-hosted, SIL Open Font License; see fonts/) ---------- */
+@font-face { font-family: "Source Serif 4"; src: url(fonts/source-serif-4-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Source Serif 4"; src: url(fonts/source-serif-4-latin-600-normal.woff2) format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "IBM Plex Sans"; src: url(fonts/ibm-plex-sans-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "IBM Plex Sans"; src: url(fonts/ibm-plex-sans-latin-600-normal.woff2) format("woff2"); font-weight: 600; font-display: block; }
+
+/* ---------- stage theme: Vellum (swap these variables for other themes) ---------- */
+.theme-vellum {
+  --bg: #F5F1E8;
+  --main: #14110D;
+  --sub: #2B251F;
+  --label: #3F362E;
+  --accent: #6E2419;
+  --rule: #CFC4B0;
+}
+
+/* ---------- stage geometry (tune once after test uploads; never per platform) ---------- */
+.stage[data-format="section"] {
+  width: 540px; height: 960px;
+  --safe-top: 96px; --safe-right: 81px; --safe-bottom: 240px; --safe-left: 40px;
+}
+.stage[data-format="full"] {
+  width: 960px; height: 540px;
+  --safe-top: 44px; --safe-right: 48px; --safe-bottom: 64px; --safe-left: 48px;
+}
+
+:root {
+  --serif: "Source Serif 4", Georgia, serif;
+  --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: #D9D6D0;
+  color: #1d1d1f;
+  font: 14px/1.4 var(--sans);
+}
+#app { display: flex; align-items: flex-start; min-height: 100%; }
+
+/* ---------- stage ---------- */
+#stage-wrap { flex: none; padding: 24px; position: sticky; top: 0; }
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--main);
+  cursor: none;
+  outline: 1px solid rgba(0, 0, 0, .25);
+  outline-offset: 0;
+  -webkit-font-smoothing: antialiased;
+}
+.stage * { cursor: none; }
+
+/* The safe area. Everything is fitted inside it. */
+.stage .area {
+  position: absolute;
+  top: var(--safe-top); right: var(--safe-right); bottom: var(--safe-bottom); left: var(--safe-left);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.stage .area.center { justify-content: center; }
+
+.stage .label {
+  font-family: var(--sans);
+  font-size: var(--l);
+  line-height: 1.3;
+  color: var(--label);
+  margin: 0 0 .1em;
+}
+.stage .label .nm { font-weight: 600; }
+.stage .label .ms, .stage .label .dot { font-weight: 400; }
+.stage .text {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 1.28;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.stage .text.absent { color: var(--label); font-family: var(--sans); font-size: var(--l) !important; }
+
+.stage .row.main .label { color: var(--accent); }
+.stage .row.main .text { font-size: var(--m); color: var(--main); }
+.stage .row.comp .text { font-size: var(--c); color: var(--sub); }
+.stage .row.comp, .stage .row.same {
+  border-top: 1px solid var(--rule);
+  padding-top: .6em;
+  margin-top: .6em;
+}
+.stage .row.same .label { margin: 0; }
+.stage .tags {
+  font-family: var(--sans);
+  font-size: max(12px, calc(var(--l) * .85));
+  color: var(--label);
+  margin-top: .8em;
+}
+
+/* Section (portrait) */
+.stage .head { margin-bottom: 8px; }
+.stage .head .book {
+  font-family: var(--sans); font-weight: 600; font-size: 18px; line-height: 1.2;
+  color: var(--accent);
+}
+.stage .head .num {
+  font-family: var(--serif); font-weight: 600; font-size: 38px; line-height: 1.1;
+  color: var(--main);
+}
+.stage[data-format="section"] .row.main .text { margin-bottom: .1em; }
+.stage[data-format="section"] .row.comp,
+.stage[data-format="section"] .row.same { font-size: 16px; padding-top: .45em; margin-top: .45em; } /* spacing em base */
+
+/* Full video (landscape) */
+.stage .cols { display: flex; height: 100%; }
+.stage .col { position: relative; overflow: hidden; height: 100%; }
+.stage .col.left { flex: 55 1 0; padding-right: 28px; }
+.stage .col.right { flex: 45 1 0; padding-left: 28px; border-left: 1px solid var(--rule); }
+.stage .head-line {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 16px;
+}
+.stage .head-line .ref { font-family: var(--serif); font-weight: 600; font-size: 26px; color: var(--main); }
+.stage .head-line .ref .book { color: var(--accent); }
+.stage .head-line .count { font-family: var(--sans); font-size: 15px; color: var(--label); }
+.stage[data-format="full"] .row.comp:first-child,
+.stage[data-format="full"] .row.same:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+.stage[data-format="full"] .row.comp, .stage[data-format="full"] .row.same { font-size: 14px; }
+
+/* Debug overlay: shades everything outside the safe area. */
+.stage .debug {
+  position: absolute; pointer-events: none;
+  top: var(--safe-top); right: var(--safe-right); bottom: var(--safe-bottom); left: var(--safe-left);
+  outline: 1px dashed rgba(200, 0, 0, .8);
+  box-shadow: 0 0 0 2000px rgba(200, 0, 0, .16);
+}
+.stage:not(.show-debug) .debug { display: none; }
+
+/* ---------- control panel ---------- */
+#panel {
+  flex: 1; min-width: 340px; max-width: 460px;
+  padding: 20px 20px 60px;
+  background: #F7F7F5;
+  min-height: 100vh;
+  border-left: 1px solid #c9c6bf;
+}
+#loading { color: #6E2419; margin-bottom: 10px; }
+.group { margin-bottom: 18px; }
+.group h3 { font-size: 12px; text-transform: none; color: #555; margin: 0 0 6px; font-weight: 600; }
+button, select, input, textarea { font: inherit; }
+button {
+  border: 1px solid #b9b5ad; background: #fff; border-radius: 6px;
+  padding: 6px 12px; cursor: pointer; color: #1d1d1f;
+}
+button:hover { background: #f0eee9; }
+button.primary { background: #6E2419; color: #fff; border-color: #6E2419; }
+button.primary:hover { background: #5b1d14; }
+button.on { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+button.small { padding: 1px 8px; font-size: 12px; margin-left: 6px; }
+.buttons { display: flex; gap: 8px; margin-bottom: 8px; }
+.buttons button { flex: 1; }
+.seg { display: flex; margin-bottom: 8px; }
+.seg button { flex: 1; border-radius: 0; }
+.seg button:first-child { border-radius: 6px 0 0 6px; }
+.seg button:last-child { border-radius: 0 6px 6px 0; border-left: 0; }
+.seg button small { color: inherit; opacity: .6; }
+select { padding: 5px; border-radius: 6px; border: 1px solid #b9b5ad; background: #fff; }
+.pickers { display: flex; gap: 8px; margin: 8px 0; }
+.pickers select:first-child { flex: 1; }
+#resume { width: 100%; }
+.check { display: block; font-size: 13px; color: #444; margin: 4px 0; }
+
+.search-wrap { position: relative; }
+#search { width: 100%; padding: 8px 10px; border: 1px solid #b9b5ad; border-radius: 6px; }
+#results {
+  position: absolute; z-index: 5; left: 0; right: 0; top: 40px;
+  max-height: 60vh; overflow: auto;
+  background: #fff; border: 1px solid #b9b5ad; border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+}
+#results .r { padding: 7px 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px; }
+#results .r.sel { background: #f3e9e7; }
+#results .r b { color: #6E2419; }
+#results .r mark { background: #f6dd8a; color: inherit; }
+#results .meta { padding: 6px 10px; color: #666; font-size: 12px; }
+
+.now-ref { font-size: 22px; font-weight: 600; }
+.section-info { margin-top: 4px; }
+.section-info .h { font-weight: 600; }
+.section-info .warn, .hint.warn { color: #9a3412; }
+.next { margin-top: 8px; color: #555; font-size: 13px; }
+.next b { color: #333; }
+.timer-line { color: #444; }
+#timer { font-variant-numeric: tabular-nums; font-weight: 600; }
+.hint { font-size: 12px; color: #555; margin: 6px 0; }
+#hard-list { font-size: 13px; margin: 6px 0; }
+#hard-list a { color: #6E2419; margin-right: 8px; cursor: pointer; text-decoration: underline; }
+.attempts { font-size: 13px; color: #444; }
+textarea { width: 100%; border: 1px solid #b9b5ad; border-radius: 6px; padding: 6px 8px; resize: vertical; }
+#audit-out { font-size: 12px; margin-top: 6px; max-height: 240px; overflow: auto; }
+#audit-out a { color: #6E2419; cursor: pointer; }
+.keys summary { cursor: pointer; font-size: 13px; color: #555; }
+.keys dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 12px; margin: 6px 0 0; }
+.keys dt { font-weight: 600; }
+.keys dd { margin: 0; color: #555; }
+
+/* Record mode hides practice helpers. */
+body.record .practice-only { display: none; }
+body.record #panel { background: #FBF4F2; }
+body.record #mode-seg button[data-mode="record"] { background: #b91c1c; border-color: #b91c1c; }

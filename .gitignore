@@ -1,0 +1,4 @@
+# Raw downloads (re-create with scripts/fetch-sources.sh)
+data/raw/*
+!data/raw/README.md
+.DS_Store

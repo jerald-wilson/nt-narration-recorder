@@ -1,0 +1,1992 @@
+NT Narration Recorder — data build 2026-09-28T12:55:45.919Z
+
+SOURCES
+  Majority Standard Bible  msb.txt (7957 verses incl. Old Testament)
+  King James Version       eng-kjv2006 (7957 verses incl. Old Testament)
+  Berean Literal Bible     blb.txt (7957 verses incl. Old Testament)
+  Bible in Basic English   engBBE (7957 verses incl. Old Testament)
+  Section headings         Berean Standard Bible (993 headings)
+  Heading overrides        2 from data/heading-overrides.json
+
+WROTE data/nt.json — 27 books, 260 chapters, 7960 verses (4.3 MB)
+
+FLAGS
+  bracketed:bbe            12
+  long                     129
+  missing:bbe              19
+  missing:blb              19
+  missing:kjv              3
+  missing:msb              7
+  same-as-main:bbe         4
+  same-as-main:blb         67
+  same-as-main:kjv         9
+  missing verses:
+    MAT 17:21 (missing:blb)
+    MAT 17:21 (missing:bbe)
+    MAT 18:11 (missing:blb)
+    MAT 18:11 (missing:bbe)
+    MAT 23:14 (missing:blb)
+    MAT 23:14 (missing:bbe)
+    MRK 7:16 (missing:blb)
+    MRK 7:16 (missing:bbe)
+    MRK 9:44 (missing:blb)
+    MRK 9:44 (missing:bbe)
+    MRK 9:46 (missing:blb)
+    MRK 9:46 (missing:bbe)
+    MRK 11:26 (missing:blb)
+    MRK 11:26 (missing:bbe)
+    MRK 15:28 (missing:blb)
+    MRK 15:28 (missing:bbe)
+    LUK 17:36 (missing:msb)
+    LUK 17:36 (missing:blb)
+    LUK 17:36 (missing:bbe)
+    LUK 23:17 (missing:blb)
+    LUK 23:17 (missing:bbe)
+    JHN 5:4 (missing:blb)
+    JHN 5:4 (missing:bbe)
+    ACT 8:37 (missing:msb)
+    ACT 8:37 (missing:blb)
+    ACT 8:37 (missing:bbe)
+    ACT 15:34 (missing:msb)
+    ACT 15:34 (missing:blb)
+    ACT 15:34 (missing:bbe)
+    ACT 24:7 (missing:msb)
+    ACT 24:7 (missing:blb)
+    ACT 24:7 (missing:bbe)
+    ACT 28:29 (missing:blb)
+    ACT 28:29 (missing:bbe)
+    ROM 14:24 (missing:kjv)
+    ROM 14:24 (missing:blb)
+    ROM 14:24 (missing:bbe)
+    ROM 14:25 (missing:kjv)
+    ROM 14:25 (missing:blb)
+    ROM 14:25 (missing:bbe)
+    ROM 14:26 (missing:kjv)
+    ROM 14:26 (missing:blb)
+    ROM 14:26 (missing:bbe)
+    ROM 16:24 (missing:blb)
+    ROM 16:24 (missing:bbe)
+    ROM 16:25 (missing:msb)
+    ROM 16:26 (missing:msb)
+    ROM 16:27 (missing:msb)
+    ... 8 more in data/build-report.txt
+  bracketed verses:
+    JHN 7:53 (bracketed:bbe)
+    JHN 8:1 (bracketed:bbe)
+    JHN 8:2 (bracketed:bbe)
+    JHN 8:3 (bracketed:bbe)
+    JHN 8:4 (bracketed:bbe)
+    JHN 8:5 (bracketed:bbe)
+    JHN 8:6 (bracketed:bbe)
+    JHN 8:7 (bracketed:bbe)
+    JHN 8:8 (bracketed:bbe)
+    JHN 8:9 (bracketed:bbe)
+    JHN 8:10 (bracketed:bbe)
+    JHN 8:11 (bracketed:bbe)
+  long verses:
+    MAT 1:20 (long)
+    MAT 2:13 (long)
+    MAT 2:16 (long)
+    MAT 4:24 (long)
+    MAT 5:19 (long)
+    MAT 5:22 (long)
+    MAT 6:5 (long)
+    MAT 13:15 (long)
+    MAT 14:19 (long)
+    MAT 15:32 (long)
+    MAT 16:21 (long)
+    MAT 17:20 (long)
+    MAT 19:12 (long)
+    MAT 19:28 (long)
+    MAT 21:21 (long)
+    MAT 22:16 (long)
+    MAT 23:23 (long)
+    MAT 27:64 (long)
+    MRK 6:2 (long)
+    MRK 6:41 (long)
+    MRK 6:56 (long)
+    MRK 10:32 (long)
+    MRK 12:14 (long)
+    LUK 3:1 (long)
+    LUK 4:18 (long)
+    LUK 5:17 (long)
+    LUK 6:17 (long)
+    LUK 6:42 (long)
+    LUK 7:22 (long)
+    LUK 8:29 (long)
+    LUK 10:21 (long)
+    LUK 11:31 (long)
+    LUK 12:48 (long)
+    LUK 12:58 (long)
+    LUK 14:12 (long)
+    LUK 14:21 (long)
+    JHN 6:22 (long)
+    JHN 8:44 (long)
+    JHN 18:37 (long)
+    JHN 19:24 (long)
+    JHN 19:31 (long)
+    JHN 19:38 (long)
+    JHN 20:25 (long)
+    JHN 21:17 (long)
+    JHN 21:18 (long)
+    ACT 1:13 (long)
+    ACT 5:21 (long)
+    ACT 9:17 (long)
+    ACT 10:22 (long)
+    ACT 12:20 (long)
+    ACT 13:46 (long)
+    ACT 14:15 (long)
+    ACT 17:5 (long)
+    ACT 17:18 (long)
+    ACT 19:27 (long)
+    ACT 21:11 (long)
+    ACT 21:24 (long)
+    ACT 21:25 (long)
+    ACT 22:3 (long)
+    ACT 22:30 (long)
+    ACT 23:6 (long)
+    ACT 23:21 (long)
+    ACT 25:24 (long)
+    ACT 27:12 (long)
+    ACT 28:17 (long)
+    ACT 28:23 (long)
+    ACT 28:27 (long)
+    ROM 4:11 (long)
+    ROM 4:16 (long)
+    ROM 6:19 (long)
+    ROM 13:9 (long)
+    1CO 4:6 (long)
+    1CO 5:11 (long)
+    1CO 7:34 (long)
+    1CO 10:13 (long)
+    2CO 7:11 (long)
+    2CO 11:9 (long)
+    2CO 11:26 (long)
+    2CO 12:20 (long)
+    GAL 2:9 (long)
+    GAL 2:14 (long)
+    GAL 2:16 (long)
+    PHP 1:27 (long)
+    PHP 4:8 (long)
+    1TH 2:13 (long)
+    1TI 3:16 (long)
+    1TI 6:2 (long)
+    HEB 4:12 (long)
+    HEB 7:11 (long)
+    HEB 8:5 (long)
+    HEB 8:10 (long)
+    HEB 9:15 (long)
+    HEB 10:29 (long)
+    HEB 11:7 (long)
+    1PE 1:12 (long)
+    1PE 4:11 (long)
+    2PE 2:1 (long)
+    2PE 3:16 (long)
+    1JN 2:27 (long)
+    1JN 5:16 (long)
+    3JN 1:10 (long)
+    JUD 1:3 (long)
+    JUD 1:12 (long)
+    REV 2:10 (long)
+    REV 2:13 (long)
+    REV 2:14 (long)
+    REV 2:17 (long)
+    REV 3:12 (long)
+    REV 5:6 (long)
+    REV 5:13 (long)
+    REV 6:8 (long)
+    REV 7:9 (long)
+    REV 8:13 (long)
+    REV 9:17 (long)
+    REV 9:20 (long)
+    REV 11:18 (long)
+    REV 12:10 (long)
+    REV 13:14 (long)
+    REV 14:18 (long)
+    REV 17:8 (long)
+    REV 18:12 (long)
+    REV 18:19 (long)
+    REV 18:22 (long)
+    REV 18:23 (long)
+    REV 19:10 (long)
+    REV 19:20 (long)
+    REV 20:4 (long)
+    REV 20:12 (long)
+    REV 21:8 (long)
+    ... 89 more in data/build-report.txt
+  same-as-main verses: 80 (not listed; used to collapse rows)
+
+TOP 20 VERSES BY COMBINED LENGTH (layout stress list)
+   1. Revelation 20:4        1478 chars
+   2. Revelation 17:8        1203 chars
+   3. Acts 28:17             1147 chars
+   4. Luke 6:42              1133 chars
+   5. John 8:44              1116 chars
+   6. John 19:24             1114 chars
+   7. Revelation 11:18       1102 chars
+   8. 2 Corinthians 7:11     1097 chars
+   9. Galatians 2:16         1097 chars
+  10. Luke 10:21             1091 chars
+  11. John 21:17             1079 chars
+  12. Acts 17:18             1069 chars
+  13. Matthew 2:16           1066 chars
+  14. 1 Peter 1:12           1052 chars
+  15. Revelation 3:12        1047 chars
+  16. Revelation 19:20       1046 chars
+  17. Revelation 6:8         1043 chars
+  18. Matthew 23:23          1034 chars
+  19. Matthew 13:15          1033 chars
+  20. Revelation 9:20        1027 chars
+
+SECTIONS — 993 total
+  Sections that cross a chapter boundary: 0
+  Sections over 3:00 at 140 words/min (publish as regular vertical videos, not Shorts): 30 of 993
+     5:27  Matthew 23:1–36                Woes to Scribes and Pharisees
+     3:14  Mark 5:21–43                   The Healing Touch of Jesus
+     3:25  Luke 1:5–25                    Gabriel Foretells John’s Birth
+     3:11  Luke 3:1–20                    The Mission of John the Baptist
+     3:28  Luke 15:11–32                  The Parable of the Prodigal Son
+     3:12  Luke 24:13–35                  The Road to Emmaus
+     3:15  John 3:1–21                    Jesus and Nicodemus
+     3:28  John 4:1–26                    Jesus and the Samaritan Woman
+     5:55  John 6:22–58                   Jesus the Bread of Life
+     3:09  John 7:1–24                    Jesus Teaches at the Feast
+     3:00  John 8:12–29                   Jesus the Light of the World
+     3:23  John 9:13–34                   The Pharisees Investigate the Healing
+     3:14  John 10:1–21                   Jesus the Good Shepherd
+     3:42  Acts 2:14–36                   Peter Addresses the Crowd
+     4:28  Acts 13:13–41                  In Pisidian Antioch
+     3:31  Acts 19:21–41                  The Riot in Ephesus
+     3:23  Acts 20:17–38                  Paul’s Farewell to the Ephesians
+     3:24  Acts 22:1–21                   Paul’s Defense to the Crowd
+     4:06  Acts 26:1–23                   Paul’s Testimony to Agrippa
+     3:44  Romans 9:6–29                  God’s Sovereign Choice
+     3:19  Romans 10:1–21                 The Word Brings Salvation
+     3:09  1 Corinthians 7:25–40          The Unmarried and Widowed
+     3:03  1 Corinthians 9:1–18           The Rights of an Apostle
+     3:58  1 Corinthians 14:1–25          Prophecy and Tongues
+     3:09  2 Corinthians 7:1–16           Paul’s Joy in the Corinthians
+     3:01  2 Corinthians 10:1–18          Paul’s Apostolic Authority
+     3:27  Hebrews 9:11–28                Redemption through His Blood
+     3:00  Hebrews 10:19–39               A Call to Persevere
+     4:09  2 Peter 2:1–22                 Deliverance from False Prophets
+     3:14  Revelation 21:9–27             The New Jerusalem
+  Section length: shortest 0:08, median 1:04, longest 5:55
+  (Every section's estimated length is in the app's control panel and in its CSV export.)
+
+SMALL-TEXT VERSES (estimate): Section-format comparison text below 18px — 1638
+    Revelation 20:4        ~12px
+    Revelation 17:8        ~13px
+    Acts 28:17             ~14px
+    Luke 6:42              ~14px
+    John 8:44              ~14px
+    John 19:24             ~14px
+    Revelation 11:18       ~14px
+    2 Corinthians 7:11     ~14px
+    Galatians 2:16         ~14px
+    Luke 10:21             ~14px
+    John 21:17             ~14px
+    Acts 17:18             ~14px
+    Matthew 2:16           ~14px
+    1 Peter 1:12           ~14px
+    Revelation 3:12        ~14px
+    Revelation 19:20       ~14px
+    Revelation 6:8         ~14px
+    Matthew 23:23          ~14px
+    Matthew 13:15          ~14px
+    Revelation 9:20        ~14px
+    Acts 28:27             ~14px
+    Romans 4:11            ~14px
+    Revelation 5:13        ~14px
+    Revelation 14:18       ~14px
+    Acts 5:21              ~14px
+    Acts 9:17              ~14px
+    Matthew 2:13           ~14px
+    Revelation 5:6         ~14px
+    1 Corinthians 7:34     ~14px
+    1 Peter 4:11           ~14px
+    3 John 1:10            ~14px
+    Luke 12:58             ~14px
+    Luke 5:17              ~14px
+    2 Peter 2:1            ~14px
+    Revelation 18:23       ~14px
+    Mark 6:2               ~14px
+    Matthew 5:22           ~14px
+    Acts 12:20             ~14px
+    Luke 4:18              ~14px
+    Revelation 7:9         ~14px
+    Luke 14:21             ~14px
+    Philippians 1:27       ~14px
+    Hebrews 7:11           ~14px
+    Revelation 2:17        ~14px
+    Acts 21:24             ~14px
+    Mark 12:14             ~14px
+    John 18:37             ~14px
+    Acts 28:23             ~14px
+    Revelation 9:17        ~14px
+    1 John 2:27            ~14px
+    Revelation 12:10       ~14px
+    Acts 17:5              ~14px
+    Revelation 2:14        ~14px
+    John 21:18             ~14px
+    Acts 14:15             ~14px
+    Galatians 2:14         ~14px
+    Acts 21:11             ~14px
+    John 20:25             ~14px
+    Matthew 17:20          ~14px
+    Mark 10:32             ~14px
+    Hebrews 8:5            ~14px
+    Matthew 5:19           ~14px
+    Acts 27:12             ~14px
+    Revelation 20:12       ~14px
+    Luke 7:22              ~15px
+    Matthew 14:19          ~15px
+    Revelation 21:8        ~15px
+    1 Corinthians 5:11     ~15px
+    Matthew 19:12          ~15px
+    Philippians 4:8        ~15px
+    Matthew 21:21          ~15px
+    John 19:31             ~15px
+    Jude 1:12              ~15px
+    John 6:22              ~15px
+    Revelation 2:10        ~15px
+    Luke 3:1               ~15px
+    Revelation 18:22       ~15px
+    Acts 21:25             ~15px
+    Revelation 13:14       ~15px
+    Acts 19:27             ~15px
+    Hebrews 11:7           ~15px
+    Acts 23:6              ~15px
+    Hebrews 10:29          ~15px
+    Revelation 18:12       ~15px
+    Hebrews 9:15           ~15px
+    Revelation 19:10       ~15px
+    Matthew 15:32          ~15px
+    2 Peter 3:16           ~15px
+    Acts 22:30             ~15px
+    Luke 8:29              ~15px
+    Luke 14:12             ~15px
+    John 19:38             ~15px
+    Acts 22:3              ~15px
+    Revelation 18:19       ~15px
+    Matthew 4:24           ~15px
+    1 Corinthians 10:13    ~15px
+    Acts 1:13              ~15px
+    Acts 23:21             ~15px
+    Matthew 27:64          ~15px
+    Matthew 16:21          ~15px
+    Matthew 22:16          ~15px
+    Revelation 2:13        ~15px
+    Mark 6:41              ~15px
+    Romans 6:19            ~15px
+    Revelation 8:13        ~15px
+    Matthew 1:20           ~15px
+    Romans 13:9            ~15px
+    1 John 5:16            ~15px
+    Matthew 19:28          ~15px
+    Luke 12:48             ~15px
+    2 Corinthians 11:9     ~15px
+    2 Corinthians 11:26    ~15px
+    Acts 25:24             ~15px
+    1 Thessalonians 2:13   ~15px
+    Jude 1:3               ~15px
+    1 Timothy 3:16         ~15px
+    Luke 6:17              ~15px
+    Acts 10:22             ~15px
+    Mark 6:56              ~15px
+    Acts 13:46             ~15px
+    1 Timothy 6:2          ~15px
+    Romans 4:16            ~15px
+    Galatians 2:9          ~15px
+    Hebrews 4:12           ~15px
+    Luke 11:31             ~15px
+    Matthew 6:5            ~15px
+    1 Corinthians 4:6      ~15px
+    Hebrews 8:10           ~15px
+    Romans 7:3             ~15px
+    Romans 14:6            ~15px
+    2 Corinthians 1:12     ~15px
+    Matthew 17:27          ~15px
+    Acts 21:28             ~15px
+    Revelation 22:2        ~15px
+    2 Corinthians 4:2      ~15px
+    Luke 13:14             ~15px
+    Acts 7:42              ~15px
+    Revelation 3:18        ~15px
+    Matthew 4:6            ~15px
+    Acts 21:26             ~15px
+    Revelation 18:3        ~15px
+    1 Corinthians 14:5     ~15px
+    Hebrews 1:3            ~15px
+    Luke 13:25             ~15px
+    Acts 15:7              ~15px
+    Acts 15:2              ~15px
+    Matthew 12:45          ~15px
+    2 Corinthians 12:14    ~15px
+    Acts 12:10             ~15px
+    Luke 9:12              ~15px
+    Jude 1:4               ~15px
+    Revelation 4:8         ~15px
+    Revelation 8:12        ~15px
+    1 Corinthians 1:10     ~15px
+    1 Corinthians 4:5      ~15px
+    2 Peter 2:20           ~15px
+    Acts 19:35             ~15px
+    Acts 23:15             ~15px
+    Revelation 11:6        ~15px
+    Revelation 14:13       ~15px
+    Hebrews 8:9            ~15px
+    Romans 7:13            ~15px
+    2 Corinthians 3:7      ~15px
+    Matthew 27:24          ~15px
+    Acts 16:37             ~15px
+    Revelation 18:2        ~15px
+    Acts 6:5               ~15px
+    Acts 22:5              ~15px
+    Luke 7:44              ~15px
+    Revelation 6:11        ~15px
+    Luke 6:49              ~15px
+    Romans 1:27            ~15px
+    Hebrews 9:4            ~15px
+    Luke 2:15              ~15px
+    Acts 9:39              ~15px
+    Acts 12:17             ~15px
+    Acts 9:21              ~15px
+    Acts 13:11             ~15px
+    Acts 25:26             ~15px
+    2 Peter 3:10           ~15px
+    1 Corinthians 7:5      ~15px
+    2 Corinthians 11:4     ~15px
+    Luke 1:17              ~15px
+    2 Corinthians 6:16     ~15px
+    Matthew 20:23          ~15px
+    Mark 1:45              ~15px
+    Revelation 5:8         ~15px
+    Titus 3:8              ~15px
+    John 20:19             ~15px
+    Acts 26:20             ~15px
+    Acts 27:21             ~15px
+    Luke 6:48              ~15px
+    Acts 2:17              ~15px
+    Revelation 15:2        ~15px
+    Romans 1:13            ~15px
+    2 Peter 1:4            ~15px
+    John 12:35             ~15px
+    2 Corinthians 1:6      ~15px
+    Matthew 21:23          ~15px
+    Hebrews 4:3            ~15px
+    Mark 12:33             ~15px
+    Romans 6:13            ~15px
+    Romans 5:17            ~15px
+    Acts 16:18             ~15px
+    Luke 10:22             ~15px
+    2 Corinthians 12:20    ~16px
+    1 Timothy 1:9          ~16px
+    James 4:11             ~16px
+    2 Corinthians 12:21    ~16px
+    Luke 9:33              ~16px
+    Luke 12:1              ~16px
+    Revelation 20:3        ~16px
+    Luke 12:53             ~16px
+    1 John 2:13            ~16px
+    Revelation 5:9         ~16px
+    2 Corinthians 9:5      ~16px
+    Matthew 23:37          ~16px
+    1 John 2:14            ~16px
+    Luke 24:44             ~16px
+    Matthew 18:8           ~16px
+    Revelation 14:15       ~16px
+    John 16:19             ~16px
+    Galatians 2:20         ~16px
+    Revelation 8:3         ~16px
+    Revelation 14:3        ~16px
+    Mark 11:23             ~16px
+    Romans 5:15            ~16px
+    Colossians 1:23        ~16px
+    Revelation 4:1         ~16px
+    Luke 8:47              ~16px
+    Luke 14:10             ~16px
+    Philippians 1:7        ~16px
+    Matthew 12:42          ~16px
+    Mark 14:3              ~16px
+    1 Corinthians 6:9      ~16px
+    Acts 4:10              ~16px
+    Acts 23:9              ~16px
+    Mark 12:1              ~16px
+    Matthew 21:33          ~16px
+    Mark 13:11             ~16px
+    Hebrews 9:19           ~16px
+    1 Peter 3:7            ~16px
+    Matthew 6:2            ~16px
+    Matthew 2:11           ~16px
+    John 16:13             ~16px
+    Mark 11:15             ~16px
+    Acts 23:10             ~16px
+    Romans 1:20            ~16px
+    Philippians 3:8        ~16px
+    Hebrews 2:17           ~16px
+    Luke 3:16              ~16px
+    Revelation 12:4        ~16px
+    Romans 8:11            ~16px
+    Hebrews 7:5            ~16px
+    Revelation 19:15       ~16px
+    2 Thessalonians 2:13   ~16px
+    1 John 5:20            ~16px
+    Romans 11:24           ~16px
+    Galatians 2:2          ~16px
+    Jude 1:7               ~16px
+    Acts 8:1               ~16px
+    Hebrews 13:17          ~16px
+    Revelation 3:7         ~16px
+    Acts 15:22             ~16px
+    Revelation 1:20        ~16px
+    Mark 14:72             ~16px
+    John 13:1              ~16px
+    Acts 19:9              ~16px
+    Jude 1:15              ~16px
+    John 21:15             ~16px
+    Acts 9:27              ~16px
+    Matthew 2:22           ~16px
+    Luke 13:34             ~16px
+    Luke 6:35              ~16px
+    Acts 18:2              ~16px
+    Acts 28:6              ~16px
+    1 Timothy 5:10         ~16px
+    John 21:23             ~16px
+    Acts 26:18             ~16px
+    Matthew 5:25           ~16px
+    Acts 11:26             ~16px
+    Matthew 1:17           ~16px
+    Hebrews 12:25          ~16px
+    Acts 25:23             ~16px
+    Luke 20:20             ~16px
+    Hebrews 12:2           ~16px
+    Revelation 11:13       ~16px
+    Revelation 12:14       ~16px
+    Romans 12:3            ~16px
+    Galatians 4:27         ~16px
+    John 16:17             ~16px
+    Matthew 21:32          ~16px
+    Acts 3:13              ~16px
+    Revelation 2:20        ~16px
+    Revelation 14:4        ~16px
+    John 20:15             ~16px
+    Matthew 11:21          ~16px
+    Matthew 23:27          ~16px
+    Mark 8:6               ~16px
+    Revelation 10:6        ~16px
+    Matthew 17:25          ~16px
+    Acts 5:36              ~16px
+    Revelation 21:3        ~16px
+    Mark 10:21             ~16px
+    Matthew 9:17           ~16px
+    Matthew 13:30          ~16px
+    Luke 5:36              ~16px
+    Acts 19:26             ~16px
+    1 Corinthians 1:2      ~16px
+    Mark 5:13              ~16px
+    John 9:16              ~16px
+    Acts 21:5              ~16px
+    1 Thessalonians 4:1    ~16px
+    John 15:15             ~16px
+    Acts 20:9              ~16px
+    Luke 10:13             ~16px
+    John 15:16             ~16px
+    Mark 8:31              ~16px
+    2 Corinthians 7:12     ~16px
+    Mark 7:4               ~16px
+    Luke 3:8               ~16px
+    Luke 7:6               ~16px
+    Luke 5:12              ~16px
+    Romans 7:4             ~16px
+    Revelation 3:1         ~16px
+    Luke 10:30             ~16px
+    Luke 15:29             ~16px
+    2 Peter 1:19           ~16px
+    Hebrews 10:1           ~16px
+    Matthew 23:34          ~16px
+    John 5:19              ~16px
+    Hebrews 5:12           ~16px
+    2 Peter 2:13           ~16px
+    Revelation 3:3         ~16px
+    Matthew 14:15          ~16px
+    Matthew 21:19          ~16px
+    Mark 8:38              ~16px
+    Luke 6:45              ~16px
+    Luke 9:48              ~16px
+    Acts 18:18             ~16px
+    Revelation 11:15       ~16px
+    Revelation 18:21       ~16px
+    Revelation 8:7         ~16px
+    Matthew 24:3           ~16px
+    Matthew 24:30          ~16px
+    Luke 7:39              ~16px
+    John 17:12             ~16px
+    Acts 18:27             ~16px
+    Romans 7:7             ~16px
+    2 Corinthians 10:12    ~16px
+    Hebrews 12:1           ~16px
+    Mark 16:14             ~16px
+    Matthew 23:35          ~16px
+    John 7:28              ~16px
+    John 20:2              ~16px
+    Luke 23:14             ~16px
+    John 19:23             ~16px
+    Revelation 14:10       ~16px
+    Luke 8:10              ~16px
+    Luke 8:35              ~16px
+    Acts 25:11             ~16px
+    2 Corinthians 13:10    ~16px
+    Revelation 3:9         ~16px
+    John 21:7              ~16px
+    Acts 13:1              ~16px
+    Philippians 4:3        ~16px
+    Luke 7:38              ~16px
+    Acts 17:23             ~16px
+    2 Corinthians 13:2     ~16px
+    1 Peter 5:10           ~16px
+    Acts 2:22              ~16px
+    John 3:29              ~16px
+    Matthew 10:41          ~16px
+    Matthew 22:4           ~16px
+    Acts 10:28             ~16px
+    Matthew 8:28           ~16px
+    Mark 6:11              ~16px
+    Acts 24:14             ~16px
+    1 Peter 1:7            ~16px
+    Acts 28:4              ~16px
+    2 Corinthians 12:9     ~16px
+    Revelation 2:2         ~16px
+    Revelation 20:6        ~16px
+    Matthew 11:25          ~16px
+    Matthew 24:29          ~16px
+    John 12:16             ~16px
+    Acts 5:9               ~16px
+    Hebrews 2:9            ~16px
+    Revelation 1:11        ~16px
+    Luke 11:42             ~16px
+    Acts 25:16             ~16px
+    Revelation 17:4        ~16px
+    John 1:33              ~16px
+    Acts 20:35             ~16px
+    2 Timothy 1:12         ~16px
+    Mark 6:48              ~16px
+    John 8:14              ~16px
+    Colossians 1:16        ~16px
+    1 Peter 2:9            ~16px
+    Matthew 21:42          ~16px
+    Acts 6:1               ~16px
+    Romans 4:17            ~16px
+    Matthew 9:15           ~16px
+    John 2:9               ~16px
+    Romans 11:25           ~16px
+    Revelation 6:4         ~16px
+    Luke 12:33             ~16px
+    Acts 20:24             ~16px
+    Revelation 1:9         ~16px
+    Mark 4:1               ~16px
+    Mark 6:22              ~16px
+    John 16:21             ~16px
+    Acts 7:8               ~16px
+    1 Corinthians 12:10    ~16px
+    Matthew 11:23          ~16px
+    1 Corinthians 12:28    ~16px
+    Mark 9:18              ~16px
+    Acts 19:13             ~16px
+    Revelation 12:12       ~16px
+    Matthew 3:11           ~16px
+    Matthew 21:25          ~16px
+    Romans 15:16           ~16px
+    2 Corinthians 12:6     ~16px
+    Revelation 7:2         ~16px
+    Revelation 18:7        ~16px
+    Revelation 20:10       ~16px
+    Mark 9:25              ~16px
+    Luke 12:37             ~16px
+    Hebrews 9:26           ~16px
+    1 Peter 3:21           ~16px
+    Revelation 15:3        ~16px
+    Revelation 19:18       ~16px
+    Luke 6:38              ~16px
+    John 6:51              ~16px
+    Hebrews 11:4           ~16px
+    Luke 12:46             ~16px
+    2 Thessalonians 3:6    ~16px
+    Revelation 5:11        ~16px
+    Revelation 11:19       ~16px
+    Luke 19:15             ~16px
+    Acts 19:21             ~16px
+    Romans 15:27           ~16px
+    Hebrews 2:14           ~16px
+    Hebrews 11:13          ~16px
+    Mark 13:14             ~16px
+    Luke 1:35              ~16px
+    Mark 3:5               ~16px
+    1 Peter 5:5            ~16px
+    1 Thessalonians 3:6    ~16px
+    Acts 8:27              ~16px
+    2 Corinthians 1:8      ~16px
+    Ephesians 6:12         ~16px
+    2 Timothy 4:8          ~16px
+    Revelation 10:4        ~16px
+    Acts 3:12              ~16px
+    Acts 16:14             ~16px
+    1 Corinthians 8:7      ~16px
+    Matthew 18:6           ~16px
+    1 Corinthians 7:36     ~16px
+    Revelation 19:2        ~16px
+    Matthew 12:32          ~16px
+    Acts 12:7              ~16px
+    Acts 13:22             ~16px
+    2 Corinthians 3:3      ~16px
+    Philippians 1:20       ~16px
+    John 18:28             ~16px
+    Acts 24:25             ~16px
+    Acts 26:10             ~16px
+    2 Timothy 4:17         ~16px
+    Revelation 6:6         ~16px
+    Matthew 13:19          ~16px
+    Romans 13:4            ~16px
+    1 Corinthians 11:22    ~16px
+    James 5:4              ~16px
+    Matthew 21:31          ~16px
+    John 19:12             ~16px
+    Hebrews 5:7            ~16px
+    1 Corinthians 9:15     ~16px
+    2 Corinthians 9:13     ~16px
+    Mark 12:26             ~16px
+    Luke 21:24             ~16px
+    Acts 7:5               ~16px
+    2 Peter 2:12           ~16px
+    Revelation 2:5         ~16px
+    Mark 10:33             ~16px
+    John 11:31             ~16px
+    John 17:11             ~16px
+    1 John 5:10            ~16px
+    Revelation 16:19       ~16px
+    Matthew 10:25          ~16px
+    Mark 2:26              ~16px
+    Mark 15:46             ~16px
+    1 Timothy 1:16         ~16px
+    Matthew 6:16           ~16px
+    Matthew 6:25           ~16px
+    Luke 8:27              ~16px
+    John 8:9               ~16px
+    Acts 9:31              ~16px
+    Romans 8:26            ~16px
+    Mark 11:13             ~16px
+    Luke 7:32              ~16px
+    Romans 11:22           ~16px
+    Mark 1:27              ~16px
+    Luke 16:13             ~16px
+    Acts 19:19             ~16px
+    Revelation 12:9        ~16px
+    Matthew 11:27          ~16px
+    Mark 9:31              ~16px
+    Mark 13:9              ~16px
+    Acts 15:29             ~16px
+    Revelation 14:7        ~16px
+    Acts 12:11             ~16px
+    Romans 3:25            ~16px
+    1 Corinthians 4:17     ~16px
+    1 Corinthians 14:26    ~16px
+    Colossians 2:2         ~16px
+    Revelation 1:5         ~16px
+    Revelation 16:18       ~16px
+    Matthew 27:29          ~16px
+    Mark 10:30             ~16px
+    Luke 5:19              ~16px
+    Luke 10:35             ~16px
+    Luke 19:37             ~16px
+    John 19:6              ~16px
+    2 Corinthians 5:12     ~16px
+    Revelation 10:9        ~16px
+    Revelation 19:6        ~16px
+    Matthew 5:30           ~16px
+    Matthew 26:55          ~16px
+    Luke 8:24              ~16px
+    Acts 1:11              ~16px
+    Acts 13:43             ~16px
+    1 Peter 4:3            ~16px
+    1 John 2:19            ~16px
+    Revelation 21:16       ~16px
+    Luke 2:34              ~16px
+    Luke 10:40             ~16px
+    Acts 13:50             ~16px
+    Romans 16:2            ~16px
+    1 Corinthians 7:14     ~16px
+    Luke 14:31             ~16px
+    Ephesians 2:3          ~16px
+    Revelation 7:14        ~16px
+    Matthew 25:24          ~16px
+    Acts 5:4               ~16px
+    Acts 21:21             ~16px
+    Romans 6:4             ~16px
+    Revelation 1:1         ~16px
+    Luke 5:24              ~16px
+    Revelation 16:21       ~16px
+    Mark 2:22              ~16px
+    Luke 21:12             ~16px
+    John 5:36              ~16px
+    Matthew 5:29           ~16px
+    Matthew 9:18           ~16px
+    Ephesians 2:12         ~16px
+    Colossians 1:9         ~16px
+    1 Timothy 6:17         ~16px
+    Matthew 13:52          ~16px
+    Mark 6:14              ~16px
+    Mark 10:46             ~16px
+    John 10:12             ~16px
+    John 20:17             ~16px
+    2 Corinthians 8:19     ~16px
+    Colossians 2:18        ~16px
+    Hebrews 7:27           ~16px
+    Mark 2:18              ~16px
+    Luke 7:8               ~16px
+    Luke 11:27             ~16px
+    John 12:3              ~16px
+    Acts 5:34              ~16px
+    Acts 22:24             ~16px
+    1 Peter 3:20           ~16px
+    Revelation 13:10       ~16px
+    Matthew 26:31          ~16px
+    Luke 11:32             ~16px
+    John 16:4              ~16px
+    Acts 7:35              ~16px
+    Acts 20:4              ~16px
+    Acts 24:10             ~16px
+    Revelation 15:4        ~16px
+    Matthew 6:24           ~16px
+    Mark 13:8              ~16px
+    John 15:20             ~16px
+    Acts 28:15             ~16px
+    1 Corinthians 9:10     ~16px
+    2 Corinthians 10:15    ~16px
+    Acts 23:30             ~16px
+    Matthew 8:9            ~16px
+    Matthew 18:12          ~16px
+    Luke 18:22             ~16px
+    Galatians 3:19         ~16px
+    1 Thessalonians 2:14   ~16px
+    2 Timothy 1:9          ~16px
+    Hebrews 13:9           ~16px
+    John 11:54             ~16px
+    1 John 4:3             ~16px
+    Revelation 3:8         ~16px
+    Revelation 22:6        ~16px
+    Matthew 5:13           ~16px
+    Luke 20:46             ~16px
+    Mark 14:12             ~16px
+    Revelation 2:23        ~16px
+    Matthew 13:32          ~16px
+    Matthew 23:15          ~16px
+    Mark 11:2              ~16px
+    Acts 23:23             ~16px
+    Romans 8:3             ~16px
+    1 Corinthians 16:12    ~16px
+    2 Corinthians 7:14     ~16px
+    Hebrews 9:14           ~16px
+    1 Peter 1:3            ~16px
+    Revelation 15:8        ~16px
+    Matthew 23:13          ~16px
+    Luke 4:41              ~16px
+    Luke 19:22             ~16px
+    James 5:12             ~16px
+    Revelation 4:10        ~16px
+    Luke 8:28              ~16px
+    John 21:6              ~16px
+    Acts 3:16              ~16px
+    Acts 7:52              ~16px
+    2 Corinthians 2:3      ~16px
+    James 1:11             ~16px
+    James 3:6              ~16px
+    Jude 1:9               ~16px
+    Matthew 12:41          ~16px
+    1 Peter 2:12           ~16px
+    Revelation 13:12       ~16px
+    1 Thessalonians 1:8    ~16px
+    1 Peter 3:18           ~16px
+    Revelation 10:7        ~16px
+    Matthew 6:6            ~16px
+    1 Timothy 4:6          ~16px
+    Hebrews 11:37          ~16px
+    Acts 1:16              ~16px
+    Luke 8:14              ~16px
+    John 3:2               ~16px
+    Acts 2:14              ~16px
+    Acts 20:7              ~16px
+    Romans 6:16            ~16px
+    2 Corinthians 7:7      ~16px
+    Matthew 12:25          ~16px
+    Acts 27:40             ~16px
+    1 Corinthians 2:14     ~16px
+    1 Corinthians 15:10    ~16px
+    Hebrews 11:5           ~16px
+    Revelation 22:19       ~16px
+    Mark 12:19             ~16px
+    Acts 12:19             ~16px
+    Romans 5:16            ~16px
+    1 Corinthians 14:23    ~16px
+    Luke 10:27             ~16px
+    Acts 21:34             ~16px
+    1 Corinthians 9:12     ~16px
+    Colossians 3:16        ~16px
+    Revelation 22:5        ~16px
+    Matthew 21:9           ~16px
+    John 8:28              ~16px
+    Acts 5:28              ~16px
+    Matthew 13:23          ~16px
+    John 9:22              ~16px
+    Acts 21:20             ~16px
+    1 Thessalonians 1:5    ~16px
+    Luke 19:11             ~16px
+    2 Corinthians 9:2      ~16px
+    Philippians 4:12       ~16px
+    Hebrews 2:8            ~16px
+    James 1:25             ~16px
+    Luke 19:44             ~16px
+    John 9:11              ~16px
+    Acts 17:6              ~16px
+    Ephesians 2:2          ~16px
+    Revelation 18:9        ~16px
+    Mark 14:43             ~16px
+    1 Timothy 5:13         ~16px
+    Matthew 18:9           ~16px
+    Matthew 27:19          ~16px
+    Mark 10:42             ~16px
+    Acts 4:16              ~16px
+    Colossians 4:12        ~16px
+    Revelation 3:5         ~16px
+    John 5:24              ~16px
+    Revelation 16:2        ~16px
+    Revelation 17:14       ~16px
+    Acts 10:38             ~16px
+    Galatians 2:12         ~16px
+    1 Thessalonians 2:2    ~16px
+    Hebrews 6:1            ~16px
+    Hebrews 13:21          ~16px
+    1 Peter 3:15           ~16px
+    2 Peter 2:10           ~16px
+    Jude 1:5               ~16px
+    Revelation 10:1        ~16px
+    Revelation 21:19       ~16px
+    Matthew 19:9           ~16px
+    Luke 7:12              ~16px
+    Luke 23:8              ~16px
+    John 21:25             ~16px
+    2 Corinthians 7:9      ~16px
+    Colossians 1:6         ~16px
+    1 Timothy 3:15         ~16px
+    2 Timothy 2:19         ~16px
+    1 Peter 1:2            ~16px
+    Matthew 1:18           ~16px
+    Mark 10:29             ~16px
+    Romans 9:17            ~16px
+    Revelation 14:11       ~16px
+    Luke 8:37              ~16px
+    Luke 9:42              ~16px
+    Luke 15:4              ~16px
+    Luke 20:28             ~16px
+    Luke 21:34             ~16px
+    Acts 6:9               ~16px
+    Acts 10:33             ~16px
+    Revelation 2:24        ~16px
+    Revelation 8:5         ~16px
+    Mark 14:41             ~16px
+    John 3:26              ~16px
+    Acts 11:5              ~16px
+    Romans 12:1            ~16px
+    1 Corinthians 15:15    ~16px
+    1 John 4:20            ~16px
+    Revelation 6:5         ~16px
+    Luke 13:7              ~16px
+    Hebrews 12:17          ~16px
+    Matthew 4:21           ~16px
+    Matthew 18:28          ~16px
+    John 12:34             ~16px
+    Acts 12:6              ~16px
+    Galatians 4:9          ~16px
+    Mark 9:42              ~16px
+    Luke 4:25              ~16px
+    John 14:21             ~16px
+    Acts 1:8               ~16px
+    1 Corinthians 13:2     ~16px
+    1 John 1:3             ~16px
+    1 John 3:8             ~16px
+    Matthew 13:44          ~16px
+    Matthew 25:21          ~16px
+    Mark 2:12              ~16px
+    Luke 16:26             ~16px
+    Acts 20:16             ~16px
+    Acts 24:2              ~16px
+    Acts 27:17             ~16px
+    Matthew 9:2            ~16px
+    Matthew 9:35           ~16px
+    Matthew 21:15          ~16px
+    Acts 20:28             ~16px
+    1 John 3:2             ~16px
+    Mark 6:31              ~16px
+    John 14:10             ~16px
+    Philippians 2:12       ~16px
+    2 Thessalonians 1:11   ~16px
+    Acts 9:40              ~16px
+    Revelation 2:7         ~16px
+    Matthew 13:22          ~16px
+    John 8:52              ~16px
+    John 14:9              ~16px
+    Acts 18:14             ~16px
+    Matthew 25:23          ~16px
+    Luke 18:14             ~16px
+    John 5:18              ~16px
+    John 20:26             ~16px
+    Acts 1:3               ~16px
+    Acts 2:38              ~16px
+    1 Corinthians 6:13     ~16px
+    Revelation 18:17       ~16px
+    Luke 16:25             ~16px
+    John 16:32             ~16px
+    John 21:20             ~16px
+    Acts 16:13             ~16px
+    Romans 10:14           ~16px
+    2 Corinthians 4:4      ~16px
+    Mark 8:33              ~16px
+    Luke 1:5               ~16px
+    Luke 1:20              ~16px
+    Luke 15:20             ~16px
+    Hebrews 9:23           ~16px
+    Jude 1:6               ~16px
+    Luke 18:31             ~16px
+    Luke 23:2              ~16px
+    Acts 3:25              ~16px
+    Acts 18:6              ~16px
+    Galatians 5:17         ~16px
+    James 4:4              ~16px
+    James 5:11             ~16px
+    Matthew 24:43          ~16px
+    Mark 8:34              ~16px
+    John 14:28             ~16px
+    John 19:15             ~16px
+    2 Corinthians 12:11    ~16px
+    Colossians 2:23        ~16px
+    Mark 15:36             ~16px
+    Luke 24:12             ~16px
+    Acts 13:15             ~16px
+    Romans 12:2            ~16px
+    John 6:27              ~16px
+    John 18:20             ~16px
+    1 Timothy 5:4          ~16px
+    Revelation 4:6         ~16px
+    Acts 26:11             ~16px
+    Romans 4:12            ~16px
+    1 Thessalonians 4:16   ~16px
+    James 1:27             ~16px
+    Matthew 17:12          ~16px
+    Matthew 21:16          ~16px
+    Acts 26:26             ~16px
+    Luke 12:45             ~16px
+    John 2:15              ~16px
+    1 Corinthians 7:37     ~16px
+    2 Thessalonians 1:3    ~16px
+    2 Corinthians 13:4     ~16px
+    Matthew 11:19          ~16px
+    Matthew 17:5           ~16px
+    Mark 11:18             ~16px
+    Luke 17:6              ~16px
+    Galatians 6:1          ~16px
+    2 Peter 2:21           ~16px
+    1 John 2:18            ~16px
+    Revelation 20:9        ~16px
+    Matthew 27:54          ~16px
+    John 4:42              ~16px
+    Acts 19:38             ~16px
+    1 Corinthians 15:27    ~16px
+    Galatians 3:21         ~16px
+    Hebrews 2:10           ~16px
+    Mark 6:34              ~16px
+    Mark 14:1              ~16px
+    Ephesians 4:14         ~16px
+    Revelation 3:10        ~16px
+    Luke 11:8              ~16px
+    Revelation 21:20       ~16px
+    2 Thessalonians 2:4    ~16px
+    2 Corinthians 4:6      ~16px
+    Luke 4:36              ~16px
+    1 John 3:1             ~16px
+    Matthew 26:47          ~16px
+    Luke 24:19             ~16px
+    Hebrews 10:34          ~16px
+    Revelation 22:17       ~16px
+    Acts 12:4              ~16px
+    2 Corinthians 3:18     ~16px
+    2 Timothy 1:10         ~16px
+    2 Peter 1:1            ~16px
+    1 John 1:1             ~16px
+    Luke 5:14              ~16px
+    Acts 8:32              ~16px
+    Luke 22:37             ~16px
+    John 18:15             ~16px
+    Luke 3:17              ~16px
+    Hebrews 9:11           ~16px
+    2 Peter 1:17           ~16px
+    Matthew 3:7            ~16px
+    Titus 3:3              ~16px
+    Mark 6:3               ~16px
+    Acts 23:3              ~16px
+    Hebrews 12:5           ~16px
+    Revelation 1:7         ~16px
+    John 16:25             ~16px
+    Acts 7:4               ~16px
+    John 11:44             ~16px
+    Luke 16:8              ~16px
+    John 7:35              ~16px
+    Matthew 27:3           ~16px
+    Mark 12:28             ~16px
+    John 3:18              ~16px
+    Matthew 21:41          ~16px
+    Luke 3:4               ~16px
+    Luke 8:8               ~16px
+    Luke 20:10             ~16px
+    Mark 8:17              ~16px
+    Luke 2:48              ~16px
+    2 Corinthians 8:7      ~16px
+    Acts 14:3              ~16px
+    Mark 9:47              ~16px
+    1 John 1:2             ~16px
+    Matthew 5:32           ~17px
+    Revelation 13:15       ~17px
+    John 17:24             ~17px
+    Acts 17:31             ~17px
+    Ephesians 4:16         ~17px
+    Revelation 7:1         ~17px
+    Acts 26:16             ~17px
+    Matthew 19:29          ~17px
+    2 Corinthians 12:7     ~17px
+    Revelation 6:15        ~17px
+    Galatians 3:10         ~17px
+    John 18:36             ~17px
+    Matthew 15:31          ~17px
+    Acts 26:14             ~17px
+    Matthew 16:19          ~17px
+    Acts 3:2               ~17px
+    Revelation 13:2        ~17px
+    Mark 10:19             ~17px
+    Mark 15:1              ~17px
+    Luke 18:11             ~17px
+    Acts 4:13              ~17px
+    Luke 8:25              ~17px
+    Acts 27:41             ~17px
+    Galatians 5:21         ~17px
+    Acts 15:3              ~17px
+    Romans 8:23            ~17px
+    Philippians 4:15       ~17px
+    Luke 16:24             ~17px
+    Acts 7:38              ~17px
+    Mark 2:15              ~17px
+    2 Corinthians 5:4      ~17px
+    Revelation 22:11       ~17px
+    John 14:17             ~17px
+    Revelation 19:17       ~17px
+    John 4:10              ~17px
+    1 Corinthians 5:10     ~17px
+    Acts 13:27             ~17px
+    Hebrews 11:6           ~17px
+    Matthew 27:9           ~17px
+    Revelation 12:17       ~17px
+    Mark 9:12              ~17px
+    1 Corinthians 3:10     ~17px
+    John 13:26             ~17px
+    Hebrews 7:21           ~17px
+    1 Peter 1:11           ~17px
+    Revelation 17:1        ~17px
+    Acts 7:45              ~17px
+    Ephesians 5:5          ~17px
+    Luke 9:22              ~17px
+    Revelation 10:8        ~17px
+    Revelation 18:13       ~17px
+    Revelation 20:8        ~17px
+    Luke 17:31             ~17px
+    2 Corinthians 10:7     ~17px
+    James 5:7              ~17px
+    Galatians 3:17         ~17px
+    Philippians 4:18       ~17px
+    Matthew 15:30          ~17px
+    Acts 4:21              ~17px
+    Galatians 2:6          ~17px
+    John 3:8               ~17px
+    Hebrews 6:18           ~17px
+    Revelation 17:16       ~17px
+    Mark 8:23              ~17px
+    1 Corinthians 8:10     ~17px
+    Matthew 6:26           ~17px
+    Matthew 13:54          ~17px
+    Luke 3:14              ~17px
+    Acts 19:29             ~17px
+    Romans 11:17           ~17px
+    Luke 9:16              ~17px
+    Luke 11:1              ~17px
+    Acts 1:4               ~17px
+    Acts 24:22             ~17px
+    Matthew 13:17          ~17px
+    Luke 11:29             ~17px
+    1 Corinthians 9:7      ~17px
+    Matthew 21:12          ~17px
+    Acts 26:22             ~17px
+    1 Corinthians 15:54    ~17px
+    Luke 19:8              ~17px
+    1 Corinthians 14:6     ~17px
+    Hebrews 2:3            ~17px
+    Revelation 11:5        ~17px
+    Acts 16:15             ~17px
+    Acts 17:11             ~17px
+    2 Peter 2:3            ~17px
+    Revelation 21:9        ~17px
+    Matthew 2:8            ~17px
+    Matthew 3:16           ~17px
+    Matthew 9:6            ~17px
+    Matthew 4:23           ~17px
+    Mark 5:40              ~17px
+    Mark 16:6              ~17px
+    Luke 9:26              ~17px
+    Luke 14:26             ~17px
+    John 12:9              ~17px
+    Acts 4:32              ~17px
+    2 Peter 3:9            ~17px
+    Mark 10:1              ~17px
+    Luke 7:9               ~17px
+    Acts 14:27             ~17px
+    Acts 23:18             ~17px
+    Ephesians 2:11         ~17px
+    James 2:5              ~17px
+    Matthew 3:12           ~17px
+    Mark 9:43              ~17px
+    Acts 5:37              ~17px
+    Acts 21:40             ~17px
+    1 Corinthians 9:20     ~17px
+    2 Corinthians 12:2     ~17px
+    James 2:3              ~17px
+    2 Peter 3:17           ~17px
+    Matthew 8:32           ~17px
+    John 4:45              ~17px
+    Romans 1:32            ~17px
+    1 John 2:1             ~17px
+    1 John 2:24            ~17px
+    Mark 2:4               ~17px
+    1 John 3:10            ~17px
+    Revelation 11:10       ~17px
+    Revelation 14:6        ~17px
+    Mark 1:44              ~17px
+    Mark 5:23              ~17px
+    Luke 22:61             ~17px
+    2 Corinthians 2:4      ~17px
+    Revelation 16:9        ~17px
+    Matthew 26:24          ~17px
+    Mark 5:4               ~17px
+    Mark 14:21             ~17px
+    Luke 11:24             ~17px
+    John 17:8              ~17px
+    1 Corinthians 12:3     ~17px
+    James 2:11             ~17px
+    Revelation 8:10        ~17px
+    Revelation 22:8        ~17px
+    Matthew 25:20          ~17px
+    Mark 15:43             ~17px
+    John 5:30              ~17px
+    Matthew 16:3           ~17px
+    John 4:14              ~17px
+    John 13:29             ~17px
+    John 18:18             ~17px
+    Romans 3:4             ~17px
+    1 Corinthians 10:28    ~17px
+    2 Corinthians 8:22     ~17px
+    Revelation 14:2        ~17px
+    Luke 20:19             ~17px
+    Luke 24:18             ~17px
+    Acts 15:24             ~17px
+    2 Corinthians 8:14     ~17px
+    Revelation 17:7        ~17px
+    Matthew 17:4           ~17px
+    Acts 13:17             ~17px
+    Acts 18:25             ~17px
+    Romans 2:1             ~17px
+    Revelation 2:9         ~17px
+    Revelation 17:3        ~17px
+    Matthew 26:39          ~17px
+    Matthew 26:45          ~17px
+    Mark 2:16              ~17px
+    Mark 13:34             ~17px
+    Acts 4:24              ~17px
+    Romans 1:21            ~17px
+    Matthew 13:35          ~17px
+    1 Thessalonians 4:6    ~17px
+    Luke 2:25              ~17px
+    Luke 6:1               ~17px
+    Luke 12:24             ~17px
+    Acts 5:10              ~17px
+    Colossians 2:8         ~17px
+    1 Peter 4:6            ~17px
+    Matthew 26:64          ~17px
+    Mark 11:17             ~17px
+    Luke 10:2              ~17px
+    Luke 11:46             ~17px
+    Luke 16:15             ~17px
+    1 Corinthians 14:16    ~17px
+    2 Corinthians 11:23    ~17px
+    Hebrews 4:2            ~17px
+    Revelation 22:18       ~17px
+    Acts 11:19             ~17px
+    Acts 13:25             ~17px
+    Acts 21:13             ~17px
+    Romans 7:6             ~17px
+    Hebrews 4:7            ~17px
+    1 Peter 2:20           ~17px
+    2 John 1:12            ~17px
+    Matthew 11:11          ~17px
+    Matthew 20:22          ~17px
+    1 Corinthians 1:21     ~17px
+    1 Corinthians 7:28     ~17px
+    Hebrews 12:11          ~17px
+    Revelation 3:17        ~17px
+    Revelation 11:2        ~17px
+    John 21:3              ~17px
+    Acts 16:27             ~17px
+    Revelation 1:4         ~17px
+    Luke 5:3               ~17px
+    Luke 14:18             ~17px
+    John 1:38              ~17px
+    John 13:18             ~17px
+    Acts 7:34              ~17px
+    Romans 2:15            ~17px
+    2 Peter 2:18           ~17px
+    Luke 11:7              ~17px
+    John 21:16             ~17px
+    Acts 10:17             ~17px
+    Acts 11:28             ~17px
+    Romans 15:19           ~17px
+    1 Corinthians 8:6      ~17px
+    1 Timothy 5:16         ~17px
+    Mark 10:24             ~17px
+    Luke 20:21             ~17px
+    John 7:23              ~17px
+    Acts 9:2               ~17px
+    Galatians 3:8          ~17px
+    2 Peter 1:16           ~17px
+    Matthew 4:18           ~17px
+    Luke 4:23              ~17px
+    Luke 22:52             ~17px
+    John 12:40             ~17px
+    1 Corinthians 16:15    ~17px
+    James 4:2              ~17px
+    Revelation 5:5         ~17px
+    Matthew 11:5           ~17px
+    Matthew 15:22          ~17px
+    Mark 14:65             ~17px
+    Luke 8:13              ~17px
+    Luke 10:24             ~17px
+    Acts 4:27              ~17px
+    Acts 16:3              ~17px
+    Acts 23:11             ~17px
+    Romans 11:11           ~17px
+    Revelation 16:14       ~17px
+    Luke 23:35             ~17px
+    Acts 3:10              ~17px
+    Acts 14:22             ~17px
+    2 Timothy 4:3          ~17px
+    Hebrews 10:8           ~17px
+    Hebrews 12:9           ~17px
+    Luke 9:13              ~17px
+    Acts 5:40              ~17px
+    Acts 7:10              ~17px
+    Acts 28:8              ~17px
+    Hebrews 8:8            ~17px
+    Revelation 2:1         ~17px
+    Mark 4:32              ~17px
+    Mark 6:20              ~17px
+    Luke 7:24              ~17px
+    Acts 2:46              ~17px
+    Acts 13:10             ~17px
+    1 Corinthians 15:58    ~17px
+    2 Corinthians 10:2     ~17px
+    Acts 6:7               ~17px
+    Revelation 4:4         ~17px
+    Revelation 21:4        ~17px
+    Mark 7:24              ~17px
+    Acts 8:25              ~17px
+    Acts 19:16             ~17px
+    Acts 22:29             ~17px
+    Revelation 18:8        ~17px
+    Luke 2:4               ~17px
+    Luke 8:22              ~17px
+    Luke 11:26             ~17px
+    Luke 13:28             ~17px
+    Acts 3:22              ~17px
+    Acts 27:43             ~17px
+    1 Thessalonians 2:9    ~17px
+    Revelation 9:2         ~17px
+    Revelation 13:1        ~17px
+    John 15:19             ~17px
+    Ephesians 6:9          ~17px
+    1 Thessalonians 3:5    ~17px
+    Revelation 9:5         ~17px
+    Luke 8:1               ~17px
+    John 10:18             ~17px
+    John 14:26             ~17px
+    Acts 10:4              ~17px
+    1 Corinthians 7:15     ~17px
+    2 Corinthians 6:2      ~17px
+    Hebrews 4:15           ~17px
+    Revelation 4:5         ~17px
+    Revelation 9:4         ~17px
+    Revelation 13:4        ~17px
+    Luke 4:38              ~17px
+    John 12:42             ~17px
+    Acts 27:1              ~17px
+    1 Corinthians 4:7      ~17px
+    1 Timothy 1:10         ~17px
+    Mark 4:12              ~17px
+    Mark 5:19              ~17px
+    Luke 12:28             ~17px
+    John 16:7              ~17px
+    Acts 5:16              ~17px
+    Acts 15:36             ~17px
+    Revelation 13:8        ~17px
+    Luke 17:27             ~17px
+    John 4:23              ~17px
+    Acts 2:33              ~17px
+    Acts 7:26              ~17px
+    Hebrews 11:23          ~17px
+    Hebrews 11:34          ~17px
+    1 Peter 1:18           ~17px
+    Matthew 2:9            ~17px
+    Matthew 6:30           ~17px
+    Matthew 10:23          ~17px
+    Matthew 25:44          ~17px
+    Matthew 28:7           ~17px
+    Mark 10:39             ~17px
+    Luke 12:39             ~17px
+    John 6:11              ~17px
+    Hebrews 12:27          ~17px
+    1 Peter 2:5            ~17px
+    Revelation 6:9         ~17px
+    Revelation 21:12       ~17px
+    Matthew 21:2           ~17px
+    Mark 3:8               ~17px
+    Luke 1:13              ~17px
+    John 18:16             ~17px
+    Acts 27:39             ~17px
+    Philippians 3:12       ~17px
+    Matthew 20:21          ~17px
+    Matthew 23:25          ~17px
+    Mark 2:17              ~17px
+    Luke 16:3              ~17px
+    John 2:22              ~17px
+    John 4:27              ~17px
+    1 Corinthians 4:9      ~17px
+    2 Corinthians 11:12    ~17px
+    Philippians 2:25       ~17px
+    Colossians 1:20        ~17px
+    Colossians 1:24        ~17px
+    James 1:12             ~17px
+    1 Peter 3:1            ~17px
+    Revelation 9:7         ~17px
+    Matthew 2:6            ~17px
+    Matthew 9:9            ~17px
+    Mark 9:1               ~17px
+    Acts 19:4              ~17px
+    Romans 12:8            ~17px
+    1 Thessalonians 1:1    ~17px
+    Matthew 10:42          ~17px
+    Matthew 19:21          ~17px
+    Luke 4:35              ~17px
+    Luke 11:51             ~17px
+    Acts 23:20             ~17px
+    Romans 10:19           ~17px
+    1 Corinthians 15:32    ~17px
+    1 Peter 5:12           ~17px
+    Luke 9:11              ~17px
+    John 7:39              ~17px
+    Acts 20:15             ~17px
+    Acts 28:25             ~17px
+    Romans 8:17            ~17px
+    Ephesians 1:18         ~17px
+    Matthew 7:6            ~17px
+    Matthew 23:16          ~17px
+    Mark 11:11             ~17px
+    Luke 9:10              ~17px
+    Luke 12:36             ~17px
+    Romans 15:4            ~17px
+    1 Corinthians 3:13     ~17px
+    Philippians 3:13       ~17px
+    1 Peter 2:7            ~17px
+    Revelation 22:9        ~17px
+    Matthew 3:3            ~17px
+    Matthew 8:4            ~17px
+    Matthew 12:4           ~17px
+    Mark 2:19              ~17px
+    John 4:47              ~17px
+    John 5:7               ~17px
+    Acts 13:33             ~17px
+    Acts 25:6              ~17px
+    1 Corinthians 6:11     ~17px
+    2 Corinthians 5:19     ~17px
+    Colossians 4:10        ~17px
+    1 Timothy 5:21         ~17px
+    1 John 2:7             ~17px
+    Mark 9:9               ~17px
+    John 4:9               ~17px
+    John 12:36             ~17px
+    James 5:3              ~17px
+    1 John 4:6             ~17px
+    Revelation 7:11        ~17px
+    Revelation 7:17        ~17px
+    Mark 14:70             ~17px
+    Luke 8:45              ~17px
+    Luke 12:3              ~17px
+    John 13:33             ~17px
+    John 19:11             ~17px
+    Romans 15:9            ~17px
+    2 Corinthians 1:1      ~17px
+    2 Corinthians 3:14     ~17px
+    Hebrews 7:2            ~17px
+    Hebrews 8:11           ~17px
+    Hebrews 12:23          ~17px
+    Revelation 4:7         ~17px
+    Revelation 21:6        ~17px
+    Matthew 5:18           ~17px
+    Matthew 16:23          ~17px
+    Mark 4:15              ~17px
+    Mark 9:2               ~17px
+    John 10:16             ~17px
+    John 14:12             ~17px
+    Acts 4:31              ~17px
+    Acts 16:16             ~17px
+    Acts 26:7              ~17px
+    Acts 28:21             ~17px
+    2 Peter 2:5            ~17px
+    Mark 4:20              ~17px
+    Luke 15:7              ~17px
+    Luke 20:37             ~17px
+    Acts 14:19             ~17px
+    Acts 15:23             ~17px
+    1 Corinthians 2:9      ~17px
+    1 Corinthians 15:52    ~17px
+    1 John 3:12            ~17px
+    Revelation 11:9        ~17px
+    Acts 9:11              ~17px
+    Acts 18:26             ~17px
+    Romans 8:9             ~17px
+    2 Corinthians 4:18     ~17px
+    Titus 3:5              ~17px
+    1 Peter 4:17           ~17px
+    Revelation 6:12        ~17px
+    Luke 18:13             ~17px
+    Acts 7:44              ~17px
+    1 Corinthians 9:21     ~17px
+    2 Corinthians 13:5     ~17px
+    2 Peter 1:3            ~17px
+    Revelation 14:8        ~17px
+    Mark 7:6               ~17px
+    Luke 1:22              ~17px
+    John 8:19              ~17px
+    Hebrews 9:28           ~17px
+    James 3:4              ~17px
+    Matthew 13:33          ~17px
+    Matthew 14:13          ~17px
+    Luke 11:13             ~17px
+    Luke 19:30             ~17px
+    Acts 20:3              ~17px
+    Romans 8:34            ~17px
+    1 Corinthians 7:39     ~17px
+    2 Corinthians 1:4      ~17px
+    2 Corinthians 7:1      ~17px
+    Hebrews 10:22          ~17px
+    Hebrews 11:16          ~17px
+    1 Peter 2:6            ~17px
+    Revelation 2:18        ~17px
+    Revelation 14:9        ~17px
+    Matthew 20:8           ~17px
+    Mark 8:27              ~17px
+    Mark 9:45              ~17px
+    Luke 4:42              ~17px
+    John 1:45              ~17px
+    Acts 27:27             ~17px
+    Galatians 2:4          ~17px
+    Philippians 3:9        ~17px
+    1 Thessalonians 5:23   ~17px
+    1 Timothy 2:9          ~17px
+    Titus 1:5              ~17px
+    Titus 1:7              ~17px
+    Hebrews 12:15          ~17px
+    2 Peter 2:14           ~17px
+    Revelation 19:21       ~17px
+    Matthew 26:75          ~17px
+    Luke 2:36              ~17px
+    Luke 8:12              ~17px
+    Romans 4:19            ~17px
+    Romans 14:4            ~17px
+    1 Corinthians 16:2     ~17px
+    Revelation 11:7        ~17px
+    Revelation 14:20       ~17px
+    Matthew 10:1           ~17px
+    Matthew 26:18          ~17px
+    Luke 9:39              ~17px
+    Luke 13:35             ~17px
+    John 17:23             ~17px
+    Acts 17:26             ~17px
+    Acts 26:29             ~17px
+    1 Corinthians 14:7     ~17px
+    Galatians 4:30         ~17px
+    Matthew 7:11           ~17px
+    Matthew 18:17          ~17px
+    Mark 10:14             ~17px
+    Acts 7:2               ~17px
+    Acts 19:33             ~17px
+    Revelation 7:15        ~17px
+    Matthew 5:45           ~17px
+    Matthew 24:2           ~17px
+    Luke 13:19             ~17px
+    John 4:35              ~17px
+    John 8:6               ~17px
+    Acts 7:43              ~17px
+    Acts 15:20             ~17px
+    Romans 3:19            ~17px
+    2 Corinthians 10:8     ~17px
+    1 Timothy 6:16         ~17px
+    Hebrews 7:28           ~17px
+    Revelation 16:12       ~17px
+    Matthew 24:31          ~17px
+    Acts 8:9               ~17px
+    Acts 22:25             ~17px
+    Philippians 3:21       ~17px
+    Hebrews 11:8           ~17px
+    2 Peter 3:12           ~17px
+    Revelation 11:11       ~17px
+    Revelation 19:1        ~17px
+    Matthew 12:18          ~17px
+    Matthew 18:19          ~17px
+    Luke 6:22              ~17px
+    Luke 11:17             ~17px
+    Acts 5:15              ~17px
+    2 Timothy 3:11         ~17px
+    Acts 3:21              ~17px
+    Acts 13:2              ~17px
+    Acts 16:1              ~17px
+    Acts 23:27             ~17px
+    Romans 1:25            ~17px
+    Romans 4:9             ~17px
+    Romans 14:14           ~17px
+    Galatians 6:12         ~17px
+    1 Peter 1:22           ~17px
+    Jude 1:16              ~17px
+    Mark 10:17             ~17px
+    Luke 2:7               ~17px
+    Luke 5:10              ~17px
+    John 3:31              ~17px
+    John 7:18              ~17px
+    Romans 1:29            ~17px
+    Romans 16:17           ~17px
+    1 Corinthians 4:8      ~17px
+    1 Corinthians 11:25    ~17px
+    1 Corinthians 15:28    ~17px
+    2 Corinthians 10:1     ~17px
+    2 Corinthians 10:5     ~17px
+    2 Corinthians 12:10    ~17px
+    Hebrews 11:9           ~17px
+    Revelation 17:6        ~17px
+    Revelation 19:11       ~17px
+    Luke 21:25             ~17px
+    John 6:40              ~17px
+    2 Corinthians 7:13     ~17px
+    Ephesians 1:13         ~17px
+    1 John 5:6             ~17px
+    Matthew 18:10          ~17px
+    Luke 1:3               ~17px
+    Luke 4:9               ~17px
+    Luke 6:34              ~17px
+    John 6:32              ~17px
+    Romans 2:29            ~17px
+    1 Thessalonians 2:8    ~17px
+    Mark 16:18             ~17px
+    Luke 11:14             ~17px
+    John 15:24             ~17px
+    John 19:13             ~17px
+    Acts 25:10             ~17px
+    Romans 13:3            ~17px
+    2 Corinthians 9:10     ~17px
+    2 Timothy 2:14         ~17px
+    Hebrews 9:7            ~17px
+    Revelation 14:1        ~17px
+    Matthew 7:22           ~17px
+    Matthew 24:15          ~17px
+    Luke 13:15             ~17px
+    John 1:14              ~17px
+    Acts 17:29             ~17px
+    2 Corinthians 13:7     ~17px
+    Ephesians 6:21         ~17px
+    1 Thessalonians 5:3    ~17px
+    1 Timothy 6:10         ~17px
+    Matthew 12:40          ~17px
+    Mark 15:32             ~17px
+    Luke 1:15              ~17px
+    Luke 21:8              ~17px
+    Acts 14:17             ~17px
+    Acts 22:22             ~17px
+    1 Peter 2:24           ~17px
+    Revelation 18:10       ~17px
+    Luke 22:36             ~17px
+    John 2:10              ~17px
+    Acts 18:8              ~17px
+    Acts 20:32             ~17px
+    Acts 24:1              ~17px
+    Acts 25:7              ~17px
+    1 Corinthians 11:34    ~17px
+    1 Thessalonians 4:17   ~17px
+    2 Timothy 1:8          ~17px
+    Titus 1:1              ~17px
+    Hebrews 1:5            ~17px
+    Revelation 10:10       ~17px
+    Matthew 26:65          ~17px
+    Mark 7:5               ~17px
+    Mark 12:34             ~17px
+    Luke 10:1              ~17px
+    Luke 17:20             ~17px
+    John 8:12              ~17px
+    Acts 27:30             ~17px
+    Romans 5:14            ~17px
+    2 Corinthians 5:11     ~17px
+    2 Corinthians 7:8      ~17px
+    Revelation 15:6        ~17px
+    Matthew 26:63          ~17px
+    Mark 4:17              ~17px
+    Mark 9:20              ~17px
+    Luke 20:14             ~17px
+    John 14:23             ~17px
+    Acts 16:4              ~17px
+    Philippians 4:10       ~17px
+    Hebrews 6:10           ~17px
+    Mark 12:12             ~17px
+    John 15:4              ~17px
+    John 19:20             ~17px
+    1 Corinthians 7:35     ~17px
+    2 Thessalonians 1:10   ~17px
+    Revelation 8:11        ~17px
+    Matthew 25:26          ~17px
+    Mark 14:27             ~17px
+    Luke 12:42             ~17px
+    John 10:38             ~17px
+    1 Corinthians 14:21    ~17px
+    2 Corinthians 10:13    ~17px
+    Colossians 2:19        ~17px
+    Hebrews 11:12          ~17px
+    1 Peter 3:9            ~17px
+    Matthew 22:13          ~17px
+    Mark 1:5               ~17px
+    John 12:38             ~17px
+    Acts 24:5              ~17px
+    1 Corinthians 2:13     ~17px
+    Galatians 3:16         ~17px
+    James 2:23             ~17px
+    1 John 3:17            ~17px
+    Revelation 13:7        ~17px
+    Revelation 14:14       ~17px
+    Matthew 5:20           ~17px
+    Luke 17:8              ~17px
+    1 Corinthians 5:8      ~17px
+    2 Thessalonians 2:3    ~17px
+    Luke 3:22              ~17px
+    Luke 9:36              ~17px
+    Luke 20:1              ~17px
+    John 17:1              ~17px
+    Galatians 6:14         ~17px
+    2 John 1:9             ~17px
+    Revelation 19:9        ~17px
+    Revelation 22:15       ~17px
+    Mark 6:37              ~17px
+    Luke 13:32             ~17px
+    Luke 15:13             ~17px
+    John 6:26              ~17px
+    Romans 11:2            ~17px
+    Hebrews 10:16          ~17px
+    Hebrews 11:11          ~17px
+    2 Peter 3:7            ~17px
+    Matthew 9:28           ~17px
+    Luke 18:29             ~17px
+    Romans 9:4             ~17px
+    Matthew 13:14          ~17px
+    Acts 13:34             ~17px
+    Acts 27:2              ~17px
+    Colossians 3:5         ~17px
+    Colossians 4:16        ~17px
+    Revelation 5:12        ~17px
+    Matthew 25:34          ~17px
+    Luke 20:17             ~17px
+    Acts 18:17             ~17px
+    Colossians 4:11        ~17px
+    1 Timothy 4:8          ~17px
+    Matthew 13:36          ~17px
+    Mark 5:15              ~17px
+    Luke 8:16              ~17px
+    Luke 8:18              ~17px
+    1 Corinthians 13:8     ~17px
+    Luke 11:34             ~17px
+    Luke 12:10             ~17px
+    1 Corinthians 10:16    ~17px
+    Revelation 13:16       ~17px
+    Luke 23:26             ~17px
+    2 Corinthians 11:3     ~17px
+    Revelation 13:18       ~17px
+    Revelation 19:19       ~17px
+    Matthew 11:7           ~17px
+    Matthew 16:17          ~17px
+    Luke 15:8              ~17px
+    John 21:11             ~17px
+    2 Corinthians 12:18    ~17px
+    1 Thessalonians 4:15   ~17px
+    Hebrews 13:20          ~17px
+    1 Peter 4:14           ~17px
+    Mark 8:12              ~17px
+    Mark 12:43             ~17px
+    Luke 5:37              ~17px
+    Acts 8:13              ~17px
+    1 John 1:7             ~17px
+    Revelation 16:10       ~17px
+    Matthew 3:9            ~17px
+    Luke 17:10             ~17px
+    Luke 23:22             ~17px
+    Acts 19:17             ~17px
+    1 Corinthians 12:13    ~17px
+    2 Corinthians 8:9      ~17px
+    2 Peter 3:15           ~17px
+    Luke 11:36             ~17px
+    Acts 27:13             ~17px
+    Revelation 4:11        ~17px
+    Luke 4:6               ~17px
+    Luke 4:40              ~17px
+    Romans 15:30           ~17px
+    2 Corinthians 6:14     ~17px
+    1 Timothy 4:10         ~17px
+    1 Peter 4:1            ~17px
+    John 20:1              ~17px
+    Romans 1:16            ~17px
+    Matthew 20:30          ~17px
+    Mark 9:22              ~17px
+    Luke 8:5               ~17px
+    Luke 23:29             ~17px
+    1 Timothy 4:3          ~17px
+    2 Peter 3:4            ~17px
+    Revelation 16:13       ~17px
+    Matthew 10:2           ~17px
+    Matthew 12:39          ~17px
+    Acts 17:13             ~17px
+    Revelation 18:16       ~17px
+    Mark 9:38              ~17px
+    Luke 12:27             ~17px
+    1 Corinthians 1:27     ~17px
+    1 Timothy 6:12         ~17px
+    Luke 22:10             ~17px
+    Acts 12:12             ~17px
+    Romans 2:5             ~17px
+    2 Peter 2:22           ~17px
+    1 John 2:11            ~17px
+    Luke 17:2              ~17px
+    Luke 20:9              ~17px
+    Acts 8:12              ~17px
+    Acts 22:20             ~17px
+    Mark 10:38             ~17px
+    Colossians 2:13        ~17px
+    Acts 8:39              ~17px
+    1 Corinthians 14:9     ~17px
+    Matthew 17:17          ~17px
+    Luke 12:11             ~17px
+    Mark 6:17              ~17px
+    Acts 13:41             ~17px
+    Luke 16:9              ~17px
+    Romans 5:19            ~17px
+    Mark 7:15              ~17px
+    2 Peter 2:6            ~17px
+    Ephesians 4:18         ~17px
+    John 10:10             ~17px
+    1 Timothy 6:3          ~17px
+    Acts 27:28             ~17px
+    Acts 21:32             ~17px
+    Luke 15:6              ~17px
+    John 12:6              ~17px
+    1 Corinthians 13:12    ~17px
+    Mark 4:8               ~17px
+    Acts 15:16             ~17px
+    ... 1613 more in data/build-report.txt
+  Exact sizes: open the app, turn on Layout audit in the control panel.
+
+BIBLE IN BASIC ENGLISH MANUSCRIPT CHECK
+  Verses the Textus Receptus includes and critical texts omit or footnote:
+  Matthew 17:21
+    King James Version       Howbeit this kind goeth not out but by prayer and fasting.
+    Berean Literal Bible     (no text)
+    Bible in Basic English   (no text)
+  Matthew 18:11
+    King James Version       For the Son of man is come to save that which was lost.
+    Berean Literal Bible     (no text)
+    Bible in Basic English   (no text)
+  Acts 8:37
+    King James Version       And Philip said, If thou believest with all thine heart, thou mayest. And he answered and said, I believe that Jesus Christ is the Son of God.
+    Berean Literal Bible     (no text)
+    Bible in Basic English   (no text)
+  1 John 5:7
+    King James Version       For there are three that bear record in heaven, the Father, the Word, and the Holy Ghost: and these three are one.
+    Berean Literal Bible     For there are three testifying:
+    Bible in Basic English   And the Spirit is the witness, because the Spirit is true.
+  RESULT: Bible in Basic English leaves them out like the Berean Literal Bible. "Critical Text" label stands.
+
+SPOT CHECKS (BibleHub, 2026)
+  PASS  2 Corinthians 6:12 Majority Standard Bible
+  PASS  2 Corinthians 6:12 King James Version
+  PASS  2 Corinthians 6:12 Berean Literal Bible
+  PASS  2 Corinthians 6:12 Bible in Basic English
+  PASS  John 11:35 King James Version
+  PASS  John 11:35 Berean Literal Bible
+  PASS  John 11:35 Bible in Basic English
+  PASS  John 11:35 Majority Standard Bible
+  PASS  Revelation 20:4 Majority Standard Bible begins "Then I saw the thrones, and those seated on them had been given authority to judge."
+
+TEXTUAL VARIANT PASSAGES — what the data shows
+  Acts 8:37
+    Majority Standard Bible  (no text)
+    King James Version       And Philip said, If thou believest with all thine heart, thou mayest. And he answered and said, I believe that Jesus Christ is the Son of God.
+    Berean Literal Bible     (no text)
+    Bible in Basic English   (no text)
+  Matthew 18:11
+    Majority Standard Bible  For the Son of Man came to save the lost.
+    King James Version       For the Son of man is come to save that which was lost.
+    Berean Literal Bible     (no text)
+    Bible in Basic English   (no text)
+  1 John 5:7
+    Majority Standard Bible  For there are three that testify:
+    King James Version       For there are three that bear record in heaven, the Father, the Word, and the Holy Ghost: and these three are one.
+    Berean Literal Bible     For there are three testifying:
+    Bible in Basic English   And the Spirit is the witness, because the Spirit is true.
+  1 John 5:8
+    Majority Standard Bible  the Spirit, the water, and the blood—and these three are in agreement.
+    King James Version       And there are three that bear witness in earth, the Spirit, and the water, and the blood: and these three agree in one.
+    Berean Literal Bible     the Spirit and the water and the blood—and the three are into the one.
+    Bible in Basic English   There are three witnesses, the Spirit, the water, and the blood: and all three are in agreement.
+  Mark 16:9–20 (first and last verse):
+  Mark 16:9   [section: Jesus Appears to Mary Magdalene]
+    Majority Standard Bible  Early on the first day of the week, after Jesus had risen, He appeared first to Mary Magdalene, from whom He had driven out seven demons.
+    King James Version       Now when Jesus was risen early the first day of the week, he appeared first to Mary Magdalene, out of whom he had cast seven devils.
+    Berean Literal Bible     And having risen early on the first of the week, He appeared first to Mary Magdalene, from whom He had cast out seven demons.
+    Bible in Basic English   Now when he came back from the dead early on the first day of the week, he went first to Mary Magdalene, from whom he had sent out seven evil spirits.
+  Mark 16:20
+    Majority Standard Bible  And they went out and preached everywhere, and the Lord worked through them, confirming His word by the signs that accompanied it. Amen.
+    King James Version       And they went forth, and preached every where, the Lord working with them, and confirming the word with signs following. Amen.
+    Berean Literal Bible     And they, having gone out, preached everywhere, the Lord working with them and confirming the word by the accompanying signs.
+    Bible in Basic English   And they went out, preaching everywhere, the Lord working with them, and giving witness to the word by the signs which came after. So be it.
+  John 7:53–8:11 (first and last verse):
+  John 7:53
+    Majority Standard Bible  Then each went to his own home.
+    King James Version       And every man went unto his own house.
+    Berean Literal Bible     And each went to his home.
+    Bible in Basic English   [And every man went to his house;
+  John 8:11
+    Majority Standard Bible  “No one, Lord,” she answered. “Then neither do I condemn you,” Jesus declared. “Go and sin no more.”
+    King James Version       She said, No man, Lord. And Jesus said unto her, Neither do I condemn thee: go, and sin no more.
+    Berean Literal Bible     And she said, “No one, Lord.” And Jesus said to her, “Neither do I condemn you. Go, and from now on sin no more.”
+    Bible in Basic English   And she said, No man, Lord. And Jesus said, And I do not give a decision against you: go, and never do wrong again.]
