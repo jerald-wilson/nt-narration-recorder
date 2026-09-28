@@ -9,7 +9,19 @@
   (stage.png, made by banner.sh). Add ?guides=1 to see the safe area.
 -->
 <style>
+@font-face { font-family: "Gentium Book Plus"; src: url(../fonts/gentium-book-plus-greek-400-normal.woff2) format("woff2"); unicode-range: U+0370-03FF; }
+@font-face { font-family: "Gentium Book Plus"; src: url(../fonts/gentium-book-plus-greek-ext-400-normal.woff2) format("woff2"); unicode-range: U+1F00-1FFF; }
+@font-face { font-family: "Source Serif 4"; src: url(../fonts/source-serif-4-latin-400-italic.woff2) format("woff2"); font-style: italic; }
+@font-face { font-family: "IBM Plex Sans"; src: url(../fonts/ibm-plex-sans-latin-400-normal.woff2) format("woff2"); }
 html, body { margin: 0; }
+/* Desktop and TV only (outside the phone-safe box): the verse in Greek and Latin, faint. */
+.side { position: absolute; color: #A99C87; line-height: 1.32; }
+.side .lbl { font: 23px/1.3 "IBM Plex Sans", sans-serif; letter-spacing: .01em; margin-bottom: 12px; }
+.side .t { font-size: 36px; }
+.greek .t { font-family: "Gentium Book Plus", serif; }
+.latin .t { font-family: "Source Serif 4", Georgia, serif; font-style: italic; }
+.greek { text-align: right; }
+.vrule { position: absolute; width: 2px; background: #CFC4B0; }
 body { width: 2560px; height: 1440px; position: relative; overflow: hidden; background: #F5F1E8; }
 #clip { position: absolute; overflow: hidden; }
 img { position: absolute; }
@@ -18,6 +30,9 @@ img { position: absolute; }
 </head>
 <body>
 <div id="clip"><img id="shot" src="stage.png" alt=""></div>
+<div class="side greek"><div class="lbl">Greek · Majority Text</div><div class="t">ἁγίασον αὐτοὺς<br>ἐν τῇ ἀληθείᾳ σου·<br>ὁ λόγος ὁ σὸς ἀλήθειά ἐστιν.</div></div>
+<div class="side latin"><div class="lbl">Latin · Vulgate</div><div class="t">Sanctifica eos<br>in veritate.<br>Sermo tuus veritas est.</div></div>
+<div class="vrule" id="rl"></div><div class="vrule" id="rr"></div>
 <script>
 // Content box inside the 1920 × 1080 screenshot (header to last line), measured from the image.
 const content = { x0: 90, y0: 84, x1: 1830, y1: 726 };
@@ -29,6 +44,18 @@ const clip = document.getElementById("clip"), img = document.getElementById("sho
 const cw = (content.x1 - content.x0) * s, chh = (content.y1 - content.y0) * s;
 Object.assign(clip.style, { width: cw + "px", height: chh + "px", left: safe.x + (safe.w - cw) / 2 + "px", top: safe.y + (safe.h - chh) / 2 + "px" });
 Object.assign(img.style, { width: 1920 * s + "px", left: -content.x0 * s + "px", top: -content.y0 * s + "px" });
+// Side panels live entirely outside the phone-safe box (phones crop them away cleanly),
+// hugging its edges with a rule, vertically centred on the verse.
+const cy = safe.y + safe.h / 2, gap = 36;
+const greek = document.querySelector(".greek"), latin = document.querySelector(".latin");
+greek.style.right = 2560 - (safe.x - gap) + "px";
+latin.style.left = safe.x + safe.w + gap + "px";
+const ruleH = chh * 0.8;
+Object.assign(document.getElementById("rl").style, { left: safe.x - 12 + "px", top: cy - ruleH / 2 + "px", height: ruleH + "px" });
+Object.assign(document.getElementById("rr").style, { left: safe.x + safe.w + 10 + "px", top: cy - ruleH / 2 + "px", height: ruleH + "px" });
+const place = () => { for (const el of [greek, latin]) el.style.top = cy - el.offsetHeight / 2 + "px"; };
+place();
+document.fonts.ready.then(place);
 if (new URLSearchParams(location.search).get("guides")) document.body.insertAdjacentHTML("beforeend", '<div class="guide"></div>');
 </script>
 </body>
