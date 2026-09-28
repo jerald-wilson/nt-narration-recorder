@@ -154,6 +154,7 @@ body {
   margin: 8px 0 0; padding: 6px 10px; border-radius: 6px;
   background: #1d1d1f; color: #fff; font-size: 14px;
 }
+.capture .stop-tip.warn { background: #b91c1c; }
 .group { margin-bottom: 18px; }
 .group h3 { font-size: 12px; text-transform: none; color: #555; margin: 0 0 6px; font-weight: 600; }
 button, select, input, textarea { font: inherit; }

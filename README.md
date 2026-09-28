@@ -23,6 +23,7 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 1. Pick **Section** or **Full video**, then **Record**.
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
 3. Start a screen recording of the stage (the paper-colored box only), read, and press Space for each verse.
+   Don't use full screen: it hides the menu bar's Stop button. Stop with ⏹ in the menu bar.
 4. Flubs: pause, re-read the sentence, keep going. Cut it later in the editor.
 
 | Key | Action |

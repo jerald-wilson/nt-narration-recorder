@@ -260,7 +260,11 @@ function checkCapture() {
   el.innerHTML = problems.length
     ? problems.map((p) => `<p>${p}</p>`).join("") + (sizeOk ? "" : `<p>Records at ${w} × ${h} right now (should be ${tw} × ${th}).</p>`)
     : `Ready to record: stage records at ${w} × ${h}.`;
-  if (state.mode === "record") el.innerHTML += `<p class="stop-tip">Stop the screen recording: <b>Cmd+Ctrl+Esc</b></p>`;
+  // Full screen hides the menu bar, and with it the only reliable Stop button for a macOS screen recording.
+  const fullScreen = window.innerHeight >= screen.height - 1;
+  if (state.mode === "record") el.innerHTML += fullScreen
+    ? `<p class="stop-tip warn">Full screen hides the Stop button. Leave full screen (<b>Ctrl+Cmd+F</b>) before recording.</p>`
+    : `<p class="stop-tip">To stop recording, click ⏹ in the menu bar at the top of the screen.</p>`;
 }
 window.addEventListener("resize", () => { if (DB) checkCapture(); });
 
