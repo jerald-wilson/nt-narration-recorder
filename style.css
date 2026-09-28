@@ -209,6 +209,11 @@ textarea { width: 100%; border: 1px solid #b9b5ad; border-radius: 6px; padding: 
 .keys dt { font-weight: 600; }
 .keys dd { margin: 0; color: #555; }
 
+/* ?stage=only: just the stage, for screenshots (banner, thumbnails). */
+body.stage-only #panel { display: none; }
+body.stage-only #stage-wrap { padding: 0; }
+body.stage-only .stage { outline: none; }
+
 /* Record mode hides practice helpers. */
 body.record .practice-only { display: none; }
 body.record #panel { background: #FBF4F2; }

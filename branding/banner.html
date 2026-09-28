@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Channel banner</title>
+<!--
+  YouTube banner, 2560 × 1440. Phones show only the centre 1546 × 423, so the verse
+  content is fitted inside that box. The picture is a real screenshot of the app
+  (stage.png, made by banner.sh). Add ?guides=1 to see the safe area.
+-->
+<style>
+html, body { margin: 0; }
+body { width: 2560px; height: 1440px; position: relative; overflow: hidden; background: #F5F1E8; }
+#clip { position: absolute; overflow: hidden; }
+img { position: absolute; }
+.guide { position: absolute; left: 507px; top: 508px; width: 1546px; height: 423px; outline: 4px dashed #c00; }
+</style>
+</head>
+<body>
+<div id="clip"><img id="shot" src="stage.png" alt=""></div>
+<script>
+// Content box inside the 1920 × 1080 screenshot (header to last line), measured from the image.
+const content = { x0: 90, y0: 84, x1: 1830, y1: 726 };
+const safe = { x: 507, y: 508, w: 1546, h: 423 };
+const pad = 12;
+const s = Math.min((safe.w - 2 * pad) / (content.x1 - content.x0), (safe.h - 2 * pad) / (content.y1 - content.y0));
+// Show only the content box (so the column rule doesn't run past the text), centred in the safe area.
+const clip = document.getElementById("clip"), img = document.getElementById("shot");
+const cw = (content.x1 - content.x0) * s, chh = (content.y1 - content.y0) * s;
+Object.assign(clip.style, { width: cw + "px", height: chh + "px", left: safe.x + (safe.w - cw) / 2 + "px", top: safe.y + (safe.h - chh) / 2 + "px" });
+Object.assign(img.style, { width: 1920 * s + "px", left: -content.x0 * s + "px", top: -content.y0 * s + "px" });
+if (new URLSearchParams(location.search).get("guides")) document.body.insertAdjacentHTML("beforeend", '<div class="guide"></div>');
+</script>
+</body>
+</html>

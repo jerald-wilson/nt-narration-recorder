@@ -61,7 +61,12 @@ function init() {
     };
   }
   wireControls();
-  goTo("MAT", 1, 1);
+  // Links: ?ref=acts+17:11&format=full   Add &stage=only to show just the stage (for screenshots).
+  const q = new URLSearchParams(location.search);
+  if (q.get("format") === "full" || q.get("format") === "section") state.format = q.get("format");
+  if (q.get("stage") === "only") document.body.classList.add("stage-only");
+  const start = q.get("ref") && parseRef(q.get("ref"));
+  if (start) goTo(start.b, start.c, start.v); else goTo("MAT", 1, 1);
   // Fonts change text metrics: re-fit once they are ready.
   document.fonts.ready.then(() => render());
 }
