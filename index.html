@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<form id="gate" hidden>
+  <div class="gate-box">
+    <img src="branding/profile.png" alt="" width="72" height="72">
+    <label for="gate-pw">Password</label>
+    <input id="gate-pw" type="password" autocomplete="current-password" required>
+    <button class="primary">Open</button>
+    <div id="gate-err" class="warn" hidden>That's not it. Try again.</div>
+  </div>
+</form>
 <div id="app">
 
   <!-- Recorded region. Everything inside #stage is what the viewer sees. -->

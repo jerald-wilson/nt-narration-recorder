@@ -37,11 +37,37 @@ const rangeStr = (s) => s.start[0] === s.end[0]
   : `${s.start[0]}:${s.start[1]}–${s.end[0]}:${s.end[1]}`;
 const secSeconds = (s) => (s.words / C.wordsPerMinute) * 60;
 
+// ---------- password gate (a nuisance filter; see config.js) ----------
+// Salted like scripts/set-password.js; change both together.
+async function passwordHash(pw) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("side-by-side:" + pw));
+  return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+function gate(next) {
+  // Skipped on this Mac's own server; add ?gate=1 to try it there.
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname) && !new URLSearchParams(location.search).has("gate");
+  if (!C.passwordHash || local || store.get("auth", "") === C.passwordHash) { next(); return; }
+  const form = $("#gate"), input = $("#gate-pw");
+  form.hidden = false;
+  input.focus();
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    if (await passwordHash(input.value) !== C.passwordHash) {
+      $("#gate-err").hidden = false;
+      input.select();
+      return;
+    }
+    store.set("auth", C.passwordHash); // stays signed in on this browser until the password changes
+    form.remove();
+    next();
+  };
+}
+
 // ---------- load ----------
-fetch("data/nt.json")
+gate(() => fetch("data/nt.json")
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then((data) => { DB = data; init(); })
-  .catch((e) => { console.error(e); const el = $("#loading") || document.body.appendChild(document.createElement("div")); el.textContent = `Could not load data/nt.json (${e.message}). Serve this folder over http (e.g. python3 -m http.server) and run node scripts/build-data.js first.`; });
+  .catch((e) => { console.error(e); const el = $("#loading") || document.body.appendChild(document.createElement("div")); el.textContent = `Could not load data/nt.json (${e.message}). Serve this folder over http (e.g. python3 -m http.server) and run node scripts/build-data.js first.`; }));
 
 function init() {
   $("#loading").remove();

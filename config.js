@@ -45,6 +45,10 @@ const CONFIG = {
   // Section-format comparison text below this size is listed as "small text".
   smallTextPx: 18,
 
+  // Password gate for the hosted page: a nuisance filter, not security (anyone can read the source).
+  // Set it with: node scripts/set-password.js   Empty = no password. Never asked on localhost.
+  passwordHash: "",
+
   // Title slides. The intro names the chapter (or section) and the translations; the outro leaves the
   // frame below its text empty for YouTube's end screen (subscribe button, recommended video).
   // YouTube Shorts can't have end screens, so Section videos have no slides unless added here.

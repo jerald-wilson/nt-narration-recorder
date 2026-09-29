@@ -53,6 +53,12 @@ description for every chapter video and every section video in the New Testament
 chapter (`MARK 4`). Rebuild it with `node scripts/build-descriptions.js` after changing `config.js` or
 the data.
 
+## Password
+
+The hosted page asks for a password (a nuisance filter, not security: the source is readable). Set or
+change it with `node scripts/set-password.js`, then commit and push `config.js`. An empty password
+removes the gate. It's never asked on localhost; add `?gate=1` to try it there.
+
 ## Settings
 
 Everything is in [`config.js`](config.js): translation order, manuscript labels, words per minute,

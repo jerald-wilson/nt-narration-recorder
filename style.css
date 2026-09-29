@@ -254,3 +254,12 @@ body.recording .rec-status .dot { animation: blink 1s steps(2, start) infinite; 
 .meter { width: 90px; height: 10px; background: #e3e0da; border-radius: 5px; overflow: hidden; }
 #mic-level { height: 100%; width: 0; background: #3a7a2a; transition: width .08s linear; }
 #rec-takes { margin-top: 8px; }
+
+/* Password gate (covers the page until the password is entered). */
+#gate { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; background: #D9D6D0; }
+#gate[hidden] { display: none; }
+.gate-box { display: grid; gap: 10px; width: 280px; padding: 28px; background: #FBF4F2; border: 1px solid #c9c6bf; border-radius: 10px; }
+.gate-box img { justify-self: center; border-radius: 50%; margin-bottom: 6px; }
+.gate-box label { font-weight: 600; }
+.gate-box input { padding: 8px 10px; border: 1px solid #b9b5ad; border-radius: 6px; }
+.gate-box .warn { color: #9a3412; font-size: 13px; }
