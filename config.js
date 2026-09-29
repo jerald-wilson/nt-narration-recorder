@@ -47,7 +47,7 @@ const CONFIG = {
 
   // Password gate for the hosted page: a nuisance filter, not security (anyone can read the source).
   // Set it with: node scripts/set-password.js   Empty = no password. Never asked on localhost.
-  passwordHash: "",
+  passwordHash: "afb10608fb99bd3729a9a78d0753a91574816eb8bb9d89cbd263cbd553ac8323",
 
   // Title slides. The intro names the chapter (or section) and the translations; the outro leaves the
   // frame below its text empty for YouTube's end screen (subscribe button, recommended video).
