@@ -19,7 +19,9 @@ const state = {
   book: "MAT", ch: 1, i: 0,
   format: "section", mode: "practice",
   debug: false, loop: false, hardOnly: false,
+  slide: null,          // "intro" | "outro" | null (a verse)
 };
+const slideOn = (kind) => (C.slides[state.format] || []).includes(kind);
 const timer = { running: false, start: 0, acc: 0, id: 0 };
 
 const chapter = () => DB.books[state.book].chapters[state.ch];
@@ -99,12 +101,13 @@ function goTo(b, c, v) {
   const list = chapter();
   const idx = list.findIndex((x) => x.v === +v);
   state.i = idx >= 0 ? idx : 0;
+  state.slide = null;
   render();
 }
 
 function step(dir) {
-  if (state.loop && state.mode === "practice") { render(); return; }
-  if (state.hardOnly && state.mode === "practice") {
+  if (!state.slide && state.loop && state.mode === "practice") { render(); return; }
+  if (!state.slide && state.hardOnly && state.mode === "practice") {
     const hard = hardVerses();
     if (!hard.length) return;
     const curV = verse().v;
@@ -112,6 +115,10 @@ function step(dir) {
     goTo(state.book, state.ch, nextV);
     return;
   }
+  // Slides sit before a chapter's first verse and after its last: intro, verses, outro, next intro.
+  if ((state.slide === "intro" && dir > 0) || (state.slide === "outro" && dir < 0)) { state.slide = null; render(); return; }
+  if (!state.slide && dir > 0 && state.i === chapter().length - 1 && slideOn("outro")) { state.slide = "outro"; render(); return; }
+  if (!state.slide && dir < 0 && state.i === 0 && slideOn("intro")) { state.slide = "intro"; render(); return; }
   const list = chapter();
   const ni = state.i + dir;
   if (ni >= 0 && ni < list.length) { state.i = ni; render(); return; }
@@ -121,15 +128,17 @@ function step(dir) {
   if (ci >= 0 && ci < chs.length) {
     state.ch = chs[ci];
     state.i = dir > 0 ? 0 : chapter().length - 1;
+    state.slide = slideOn(dir > 0 ? "intro" : "outro") ? (dir > 0 ? "intro" : "outro") : null;
     render();
     return;
   }
   const bi = DB.order.indexOf(state.book) + dir;
-  if (bi < 0 || bi >= DB.order.length) return;
+  if (bi < 0 || bi >= DB.order.length) return; // start or end of the New Testament
   state.book = DB.order[bi];
   const bchs = chapterNums(state.book);
   state.ch = dir > 0 ? bchs[0] : bchs[bchs.length - 1];
   state.i = dir > 0 ? 0 : chapter().length - 1;
+  state.slide = slideOn(dir > 0 ? "intro" : "outro") ? (dir > 0 ? "intro" : "outro") : null;
   render();
 }
 
@@ -227,6 +236,43 @@ function paintStage(el, fmt, b, c, v) {
   return { main: a.step[0], comp: z.step[1], label: z.step[2], fits: a.fits && z.fits };
 }
 
+// Next chapter (or book) after b c, or null at the end of the New Testament.
+function nextChapter(b, c) {
+  const chs = chapterNums(b), ci = chs.indexOf(c);
+  if (ci + 1 < chs.length) return [b, chs[ci + 1]];
+  const nb = DB.order[DB.order.indexOf(b) + 1];
+  return nb ? [nb, chapterNums(nb)[0]] : null;
+}
+function translationsHTML() {
+  const comps = C.rows.filter((r) => r !== C.readRow);
+  return `<div class="slide-rows"><div>Read from the <b>${esc(C.names[C.readRow])}</b> · ${esc(C.manuscripts[C.readRow])}</div>` +
+    `<div class="k">Compared with</div>` + comps.map((r) => `<div>${esc(C.names[r])} · ${esc(C.manuscripts[r])}</div>`).join("") + `</div>`;
+}
+// Intro and outro slides.
+function paintSlide(el, fmt, kind, b, c, v) {
+  el.dataset.format = fmt;
+  const s = sectionOf(b, c, v.v);
+  let html;
+  if (kind === "intro") {
+    html = fmt === "full"
+      ? `<div class="eyebrow">Full chapter reading</div><h1 class="slide-title"><span class="book">${esc(bookName(b))}</span> ${c}</h1>`
+      : `<div class="eyebrow">${esc(bookName(b))} ${rangeStr(s)}</div><h1 class="slide-title">${esc(s.heading)}</h1>`;
+    html += translationsHTML();
+  } else {
+    let next = "";
+    if (fmt === "full") {
+      const n = nextChapter(b, c);
+      next = n ? `Next: ${esc(bookName(n[0]))} ${n[1]} · ${esc(sectionsTouching(n[0], n[1])[0].heading)}` : "";
+    } else {
+      const n = SECTIONS[b][SECTIONS[b].indexOf(s) + 1];
+      next = n ? `Next: ${esc(n.heading)} · ${esc(bookName(b))} ${rangeStr(n)}` : "";
+    }
+    html = `<div class="eyebrow">${fmt === "full" ? `${esc(bookName(b))} ${c}` : `${esc(bookName(b))} ${rangeStr(s)}`}</div>` +
+      `<h1 class="slide-title">${esc(C.outroText)}</h1>` + (next ? `<div class="next">${next}</div>` : "");
+  }
+  el.innerHTML = `<div class="area slide ${kind}">${html}</div><div class="debug"></div>`;
+}
+
 function render() {
   if (!DB) return;
   const v = verse();
@@ -235,7 +281,10 @@ function render() {
   stage.classList.toggle("show-debug", state.debug);
   $("#debug").checked = state.debug;
 
-  const info = paintStage(stage, state.format, state.book, state.ch, v);
+  if (state.slide && !slideOn(state.slide)) state.slide = null;
+  const info = state.slide
+    ? (paintSlide(stage, state.format, state.slide, state.book, state.ch, v), { main: "–", comp: "–", label: "–", fits: true })
+    : paintStage(stage, state.format, state.book, state.ch, v);
   $("#fit-info").innerHTML = `Sizes: main ${info.main || "–"} · comparison ${info.comp} · labels ${info.label}px` +
     (info.fits ? "" : ` <b class="warn">— does not fit; report this verse</b>`);
   $("#fit-info").className = "hint" + (info.fits ? "" : " warn");
@@ -417,7 +466,13 @@ async function startTake() {
   $("#btn-rec").textContent = "Stop take (Enter)";
   const { width, height } = track.getSettings();
   const size = width && height ? ` · ${width} × ${height}` : "";
-  const show = () => recStatus(`<span class="dot">●</span> Recording ${fmtTime((Date.now() - rec.started) / 1000)}${size} · <b>Enter</b> stops`);
+  const show = () => {
+    const outro = rec.outroAt ? (Date.now() - rec.outroAt) / 1000 : -1;
+    // The outro holds for C.outroSeconds, then the take stops itself.
+    if (outro >= 0 && C.outroSeconds && outro >= C.outroSeconds) { stopTake(); return; }
+    recStatus(`<span class="dot">●</span> Recording ${fmtTime((Date.now() - rec.started) / 1000)}${size} · <b>Enter</b> stops` +
+      (outro >= 0 ? `<br>Outro ${Math.floor(outro)}s${C.outroSeconds ? ` · stops by itself at ${C.outroSeconds}s` : " · YouTube end screens need at least 5s"}` : ""));
+  };
   show();
   rec.tick = setInterval(show, 500);
 }
@@ -434,14 +489,15 @@ function stopTake() {
 // Each verse shown during a take, with seconds from the start of the take.
 function markVerse() {
   if (!rec.recorder) return;
-  const v = verse(), last = rec.marks.at(-1);
-  if (last && last.b === state.book && last.c === state.ch && last.v === v.v) return;
-  rec.marks.push({ t: (Date.now() - rec.started) / 1000, b: state.book, c: state.ch, v: v.v });
+  const v = state.slide || verse().v, last = rec.marks.at(-1);
+  if (last && last.b === state.book && last.c === state.ch && last.v === v) return;
+  rec.marks.push({ t: (Date.now() - rec.started) / 1000, b: state.book, c: state.ch, v });
+  rec.outroAt = v === "outro" ? Date.now() : 0;
 }
 
 // Title and description for a finished take, with YouTube chapter times from the verse marks.
 function takeDescription(format, marks, seconds) {
-  const { b, c, v } = marks[0];
+  const { b, c, v } = marks.find((m) => typeof m.v === "number") || { ...marks[0], v: DB.books[marks[0].b].chapters[marks[0].c][0].v };
   if (format === "section") {
     const s = sectionOf(b, c, v);
     const isShort = seconds <= C.shortMaxSeconds;
@@ -455,6 +511,10 @@ function takeDescription(format, marks, seconds) {
   if (stamps.length < 3) notes.push("YouTube shows chapter markers only with 3 or more timestamps; this chapter has " + stamps.length + ". The times still work as links in the description.");
   const known = [...stamps.map((x) => x.t).filter((t) => t != null), seconds];
   if (known.some((t, i) => i && t - known[i - 1] < 10)) notes.push("A section is under 10 seconds, so YouTube won't show chapter markers.");
+  const outro = marks.findLast((m) => m.v === "outro");
+  if (outro) notes.push(`End screen: the outro starts at ${fmtTime(outro.t)} and runs ${Math.floor(seconds - outro.t)} seconds` +
+    (seconds - outro.t < 5 ? ", too short: YouTube end screens need at least 5." : "."));
+  else if (slideOn("outro")) notes.push("No outro in this take, so the end screen will cover the last verse.");
   return `Title:\n${chapterTitle(b, c)}\n\nDescription:\n${chapterDescription(stamps)}\n` + (notes.length ? `\n(${notes.join(" ")})\n` : "");
 }
 
@@ -484,7 +544,9 @@ function renderPanel(v) {
   cp.value = state.ch;
 
   const list = chapter();
-  $("#now-ref").textContent = `${refStr(state.book, state.ch, v.v)}  (verse ${state.i + 1} of ${list.length})`;
+  $("#now-ref").textContent = state.slide
+    ? `${bookName(state.book)} ${state.ch}  (${state.slide === "intro" ? "intro slide" : "outro slide"})`
+    : `${refStr(state.book, state.ch, v.v)}  (verse ${state.i + 1} of ${list.length})`;
 
   // Section info
   const s = sectionOf(state.book, state.ch, v.v);
@@ -500,7 +562,7 @@ function renderPanel(v) {
   $("#section-info").innerHTML = html;
 
   // Next verse preview (read translation)
-  const nv = list[state.i + 1];
+  const nv = state.slide === "outro" ? null : list[state.i + (state.slide === "intro" ? 0 : 1)];
   $("#next-preview").innerHTML = nv
     ? `<b>Next ${nv.v}:</b> ${esc(nv[C.readRow] || "(not in " + C.names[C.readRow] + ")")}`
     : `<b>End of chapter.</b>`;
@@ -565,6 +627,7 @@ function reset() {
   timer.running = false; timer.acc = 0; clearInterval(timer.id);
   showTimer();
   state.i = 0;
+  state.slide = slideOn("intro") ? "intro" : null;
   render();
 }
 

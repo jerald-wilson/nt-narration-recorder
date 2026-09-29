@@ -45,6 +45,15 @@ const CONFIG = {
   // Section-format comparison text below this size is listed as "small text".
   smallTextPx: 18,
 
+  // Title slides. The intro names the chapter (or section) and the translations; the outro leaves the
+  // frame below its text empty for YouTube's end screen (subscribe button, recommended video).
+  // YouTube Shorts can't have end screens, so Section videos have no slides unless added here.
+  slides: { full: ["intro", "outro"], section: [] },
+  outroText: "Thank you for listening",
+  // Seconds the outro stays up before the take stops itself. YouTube end screens run 5–20 seconds.
+  // 0 = don't stop; press Enter.
+  outroSeconds: 10,
+
   // Metadata templates. {heading} {ref} {book} {chapter}
   // YouTube titles are at most titleMax characters. Each title uses the first template in its list
   // that fits, so a long section heading drops the translation names instead of being cut off.

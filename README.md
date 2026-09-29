@@ -25,7 +25,10 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 3. Press **Enter** to connect the built-in recorder (Chrome). Chrome asks once per session to share
    this tab and to use the microphone; allow both. Pick your mic in the panel and check its level meter.
    Turn on Do Not Disturb first: the recorder takes no computer audio, but the mic hears the speakers.
-4. Press **Enter** to start a take, read, press Space for each verse, and press **Enter** to stop.
+4. Press **R** for the chapter's intro slide, then **Enter** to start a take. Read, pressing Space for
+   each verse. Space after the last verse shows the outro slide, which leaves room for YouTube's end
+   screen (subscribe button and a recommended video); the take stops itself 10 seconds later, or press
+   **Enter** to stop sooner. Full videos have both slides; set `slides` and `outroSeconds` in `config.js`.
    The video is cropped to the stage and saves to Downloads (`MRK-4-1-section-take1.mp4`; WebM on
    older Chrome), with a matching `.txt` holding its title and description. For a Full video the
    description's chapter times come from when you pressed Space, so there's nothing to fill in. Full screen is fine. The recorder needs Chrome; in other browsers, use a screen recorder.
@@ -37,7 +40,7 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 | ←, PageUp | previous verse |
 | Enter | connect the recorder, then start / stop a take (Record) |
 | S | start / stop timer |
-| R | reset to chapter start |
+| R | back to chapter start (the intro slide) |
 | H / L | mark hard / loop verse (Practice) |
 | / and Esc | search / leave search |
 
