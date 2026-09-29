@@ -46,9 +46,12 @@ const CONFIG = {
   smallTextPx: 18,
 
   // Metadata templates. {heading} {ref} {book} {chapter}
+  // YouTube titles are at most titleMax characters. Each title uses the first template in its list
+  // that fits, so a long section heading drops the translation names instead of being cut off.
+  titleMax: 100,
   titles: {
-    section: "{heading} | {ref} | Majority Standard Bible with three translations",
-    chapter: "{book} {chapter} | Full chapter reading, Majority Standard Bible with three translations",
+    section: ["{heading} | {ref} | MSB with KJV, BLB & BBE", "{heading} | {ref}"],
+    chapter: ["{book} {chapter} | Read Aloud | MSB with KJV, BLB & BBE"],
   },
 
   // Attribution lines added to every description. All four are public domain.

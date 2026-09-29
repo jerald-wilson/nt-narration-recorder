@@ -15,6 +15,8 @@ const countWords = (s) => (s.match(/[A-Za-z0-9’']+/g) || []).length;
 const fmtTime = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
 const joinNames = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + (a.length > 2 ? "," : "") + " and " + a[a.length - 1];
 const fill = (t, o) => t.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? "");
+// First template that fits in a YouTube title; the last one is used even if it is too long.
+const title = (list, o) => list.map((t) => fill(t, o)).find((t) => t.length <= C.titleMax) ?? fill(list.at(-1), o);
 const bookName = (b) => DB.books[b].name;
 const chapterNums = (b) => Object.keys(DB.books[b].chapters).map(Number).sort((x, y) => x - y);
 const rangeStr = (s) => s.start[0] === s.end[0]
@@ -57,7 +59,7 @@ for (const b of DB.order) {
   const sections = sectionsOf(b);
   for (const c of chapterNums(b)) {
     const verses = DB.books[b].chapters[c];
-    const chTitle = fill(C.titles.chapter, { book: bookName(b), chapter: c });
+    const chTitle = title(C.titles.chapter, { book: bookName(b), chapter: c });
     const chSecs = verses.reduce((n, v) => n + countWords(v[C.readRow] || ""), 0) / C.wordsPerMinute * 60;
     out.push(rule, `${bookName(b).toUpperCase()} ${c}`, rule, "");
 
@@ -85,7 +87,7 @@ for (const b of DB.order) {
       if (s.start[0] !== s.end[0]) out.push("Crosses a chapter break.");
       out.push(
         "",
-        `Title: ${fill(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c })}`,
+        `Title: ${title(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c })}`,
         "",
         "Description:",
         `${s.heading} — ${ref}`,

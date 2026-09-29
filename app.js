@@ -634,9 +634,11 @@ function download(name, text, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 const fill = (t, o) => t.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? "");
+// First template that fits in a YouTube title; the last one is used even if it is too long.
+const title = (list, o) => list.map((t) => fill(t, o)).find((t) => t.length <= C.titleMax) ?? fill(list.at(-1), o);
 const csvCell = (s) => `"${String(s).replace(/"/g, '""')}"`;
 const fullRef = (b, s) => `${bookName(b)} ${rangeStr(s)}`;
-const chapterTitle = (b, c) => fill(C.titles.chapter, { book: bookName(b), chapter: c });
+const chapterTitle = (b, c) => title(C.titles.chapter, { book: bookName(b), chapter: c });
 // Every section belongs to the chapter it starts in.
 const sectionsStartingIn = (b, c) => SECTIONS[b].filter((s) => s.start[0] === +c);
 const sectionsTouching = (b, c) => SECTIONS[b].filter((s) => s.start[0] <= c && s.end[0] >= c);
@@ -655,7 +657,7 @@ function exportCsv() {
       "",
       ...C.attribution,
     ].join("\n");
-    rows.push([s.heading, ref, fmtTime(secs), isShort ? "Short" : "Vertical video (over 3:00)", fill(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c }), desc, chapterTitle(b, c)]);
+    rows.push([s.heading, ref, fmtTime(secs), isShort ? "Short" : "Vertical video (over 3:00)", title(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c }), desc, chapterTitle(b, c)]);
   }
   download(`sections-${b}-${c}.csv`, "﻿" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n", "text/csv;charset=utf-8");
 }
