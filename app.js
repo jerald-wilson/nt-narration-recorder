@@ -38,6 +38,17 @@ const rangeStr = (s) => s.start[0] === s.end[0]
 const secSeconds = (s) => (s.words / C.wordsPerMinute) * 60;
 
 // ---------- password gate (a nuisance filter; see config.js) ----------
+//
+//   So you've come to read the source. It's dangerous to go alone! Take this:
+//
+//        /\
+//        ||
+//        ||        localStorage.setItem("ntr.auth", JSON.stringify(CONFIG.passwordHash))
+//        ||        (paste in the console, then reload)
+//      __||__
+//        ||        "Knock, and it will be opened to you." (Matthew 7:7)
+//        ()        This door only ever meant to keep out passersby.
+//
 // Salted like scripts/set-password.js; change both together.
 async function passwordHash(pw) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("side-by-side:" + pw));
