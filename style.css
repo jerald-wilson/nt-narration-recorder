@@ -143,15 +143,15 @@ body {
 .stage .next-title { font-family: var(--serif); font-weight: 600; font-size: 40px; line-height: 1.08; color: var(--main); margin-top: 2px; }
 .stage .next-title .book { color: var(--accent); }
 .stage .next-sub { font-family: var(--sans); font-size: 18px; line-height: 1.35; color: var(--label); margin-top: 4px; }
-.stage .outro-cols { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.stage .outro-cols { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
 .stage .outro-next { flex: 1; min-width: 0; }
 .stage .outro-journey { width: 330px; text-align: right; padding-top: 4px; }
 .stage .outro-journey .count { font-family: var(--serif); font-weight: 600; font-size: 22px; color: var(--main); }
 .stage .journey { display: flex; gap: 2px; height: 8px; margin: 10px 0 8px; }
 .stage .journey i { display: block; background: linear-gradient(90deg, var(--accent) var(--p), var(--rule) var(--p)); }
 .stage .outro-journey .follow { font-family: var(--sans); font-size: 15px; color: var(--label); }
-/* Bottom-aligned just above the end-screen elements, so each label sits over its element. */
-.stage[data-format="full"] .slide.outro { top: 40px; bottom: 285px; justify-content: flex-end; }
+/* At the top of the frame, leaving everything below clear for the end-screen elements. */
+.stage[data-format="full"] .slide.outro { top: 40px; }
 
 /* Debug overlay: shades everything outside the safe area. */
 .stage .debug {
