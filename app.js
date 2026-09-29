@@ -267,13 +267,174 @@ function checkCapture() {
   el.innerHTML = problems.length
     ? problems.map((p) => `<p>${p}</p>`).join("") + (sizeOk ? "" : `<p>Records at ${w} × ${h} right now (should be ${tw} × ${th}).</p>`)
     : `Ready to record: stage records at ${w} × ${h}.`;
-  // Full screen hides the menu bar, and with it the only reliable Stop button for a macOS screen recording.
-  const fullScreen = window.innerHeight >= screen.height - 1;
-  if (state.mode === "record") el.innerHTML += fullScreen
-    ? `<p class="stop-tip warn">Full screen hides the Stop button. Leave full screen (<b>Ctrl+Cmd+F</b>) before recording.</p>`
-    : `<p class="stop-tip">To stop recording, click ⏹ in the menu bar at the top of the screen.</p>`;
 }
 window.addEventListener("resize", () => { if (DB) checkCapture(); });
+
+// ---------- built-in recorder (Chrome): the stage only, plus the microphone ----------
+// Enter connects once per session (Chrome asks to share this tab, and for the mic), then starts
+// and stops takes. Chrome's Region Capture crops the tab to #stage, so no selection box.
+// Each take downloads when it stops.
+const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, takes: 0, ctx: null, meter: 0 };
+const REC_TYPES = ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm"];
+
+function recStatus(html, warn) {
+  const el = $("#rec-status");
+  el.innerHTML = html;
+  el.className = "rec-status" + (warn ? " warn" : "");
+}
+function recIdle() {
+  const on = !!rec.video;
+  $("#btn-rec").textContent = on ? "Start take (Enter)" : "Connect recorder (Enter)";
+  recStatus(on ? `Connected. Press <b>Enter</b> to start a take.` : `Press <b>Enter</b> to connect the recorder.`);
+}
+
+async function micStream() {
+  const id = store.get("mic", "");
+  // Raw voice: the browser's call-style processing makes narration sound thin and pumping.
+  const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 };
+  if (id) audio.deviceId = { exact: id };
+  try { return await navigator.mediaDevices.getUserMedia({ audio }); }
+  catch (e) { if (!id) throw e; store.set("mic", ""); delete audio.deviceId; return navigator.mediaDevices.getUserMedia({ audio }); }
+}
+
+async function listMics() {
+  const pick = $("#mic-pick");
+  const mics = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput" && d.deviceId !== "default");
+  const cur = rec.mic?.getAudioTracks()[0]?.getSettings().deviceId || store.get("mic", "");
+  pick.innerHTML = "";
+  for (const m of mics) pick.add(new Option(m.label || "Microphone", m.deviceId));
+  if (!mics.length) pick.add(new Option("Default microphone", ""));
+  pick.value = cur;
+}
+
+function watchMic() {
+  cancelAnimationFrame(rec.meter);
+  if (!rec.ctx) rec.ctx = new AudioContext();
+  const an = rec.ctx.createAnalyser();
+  an.fftSize = 1024;
+  rec.ctx.createMediaStreamSource(rec.mic).connect(an);
+  const buf = new Float32Array(an.fftSize);
+  const bar = $("#mic-level");
+  const draw = () => {
+    an.getFloatTimeDomainData(buf);
+    let peak = 0;
+    for (const x of buf) peak = Math.max(peak, Math.abs(x));
+    const db = 20 * Math.log10(peak || 1e-6); // -60 dB .. 0 dB
+    bar.style.width = `${Math.max(0, Math.min(100, (db + 60) / 60 * 100))}%`;
+    bar.style.background = db > -3 ? "#b91c1c" : "#3a7a2a";
+    rec.meter = requestAnimationFrame(draw);
+  };
+  draw();
+}
+
+async function connectRecorder() {
+  if (!navigator.mediaDevices?.getDisplayMedia || !window.CropTarget || !window.MediaRecorder) {
+    recStatus("The built-in recorder needs Google Chrome.", true);
+    return;
+  }
+  recStatus("Chrome is asking to share this tab: choose <b>Allow</b> (or Share).");
+  let video;
+  try {
+    video = await navigator.mediaDevices.getDisplayMedia({
+      video: { displaySurface: "browser", frameRate: { ideal: 30, max: 30 } },
+      audio: false,
+      preferCurrentTab: true, selfBrowserSurface: "include", surfaceSwitching: "exclude", monitorTypeSurfaces: "exclude",
+    });
+  } catch { recStatus("Sharing was cancelled. Press <b>Enter</b> to try again.", true); return; }
+  const track = video.getVideoTracks()[0];
+  try { await track.cropTo(await CropTarget.fromElement(stage)); }
+  catch (e) {
+    video.getTracks().forEach((t) => t.stop());
+    recStatus(`Couldn't crop to the stage (${esc(e.message)}). Pick <b>this tab</b> when Chrome asks, then press <b>Enter</b> again.`, true);
+    return;
+  }
+  try { rec.mic = await micStream(); }
+  catch {
+    video.getTracks().forEach((t) => t.stop());
+    recStatus("No microphone: allow the microphone for this page (the icon at the right of the address bar), then press <b>Enter</b>.", true);
+    return;
+  }
+  rec.video = video;
+  // Clicking "Stop sharing" in Chrome's bar ends everything; save whatever was recording.
+  track.onended = () => { if (rec.recorder) stopTake(); disconnectRecorder(); };
+  await listMics();
+  watchMic();
+  recIdle();
+}
+
+function disconnectRecorder() {
+  rec.video?.getTracks().forEach((t) => t.stop());
+  rec.mic?.getTracks().forEach((t) => t.stop());
+  cancelAnimationFrame(rec.meter);
+  $("#mic-level").style.width = "0";
+  rec.video = rec.mic = null;
+  recIdle();
+}
+
+async function switchMic(id) {
+  store.set("mic", id);
+  if (!rec.mic || rec.recorder) return;
+  rec.mic.getTracks().forEach((t) => t.stop());
+  try { rec.mic = await micStream(); watchMic(); await listMics(); }
+  catch { rec.mic = null; recStatus("That microphone didn't open. Pick another one.", true); }
+}
+
+async function startTake() {
+  const track = rec.video.getVideoTracks()[0];
+  const [tw, th] = TARGET[state.format];
+  // Record at the delivery size. Chrome only scales down, so a smaller stage stays smaller (see the size check).
+  await track.applyConstraints({ width: { max: tw }, height: { max: th }, frameRate: { ideal: 30, max: 30 } }).catch(() => {});
+  const type = REC_TYPES.find((t) => MediaRecorder.isTypeSupported(t));
+  const r = new MediaRecorder(new MediaStream([track, ...rec.mic.getAudioTracks()]),
+    { mimeType: type, videoBitsPerSecond: 12_000_000, audioBitsPerSecond: 192_000 });
+  const v = verse();
+  const started = Date.now();
+  const name = `${state.book}-${state.ch}-${v.v}-${state.format}-take${++rec.takes}.${type.startsWith("video/mp4") ? "mp4" : "webm"}`;
+  rec.chunks = [];
+  r.ondataavailable = (e) => { if (e.data.size) rec.chunks.push(e.data); };
+  r.onstop = () => {
+    const blob = new Blob(rec.chunks, { type: r.mimeType });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+    const mins = fmtTime((Date.now() - started) / 1000);
+    $("#rec-takes").innerHTML = `Saved <b>${esc(name)}</b> (${mins}, ${(blob.size / 1e6).toFixed(0)} MB) to Downloads.<br>` + $("#rec-takes").innerHTML;
+  };
+  r.start(1000); // a chunk per second, so a crash loses little
+  rec.recorder = r;
+  rec.started = started;
+  document.body.classList.add("recording");
+  $("#mic-pick").disabled = true;
+  $("#btn-rec").textContent = "Stop take (Enter)";
+  const { width, height } = track.getSettings();
+  const size = width && height ? ` · ${width} × ${height}` : "";
+  const show = () => recStatus(`<span class="dot">●</span> Recording ${fmtTime((Date.now() - rec.started) / 1000)}${size} · <b>Enter</b> stops`);
+  show();
+  rec.tick = setInterval(show, 500);
+}
+
+function stopTake() {
+  clearInterval(rec.tick);
+  if (rec.recorder.state !== "inactive") rec.recorder.stop();
+  rec.recorder = null;
+  document.body.classList.remove("recording");
+  $("#mic-pick").disabled = false;
+  recIdle();
+}
+
+let recBusy = false;
+async function toggleTake() {
+  if (recBusy) return;
+  recBusy = true;
+  try {
+    if (rec.recorder) stopTake();
+    else if (!rec.video) await connectRecorder();
+    else await startTake();
+  } finally { recBusy = false; }
+}
+window.addEventListener("beforeunload", (e) => { if (rec.recorder) e.preventDefault(); });
 
 // ---------- panel ----------
 function renderPanel(v) {
@@ -554,8 +715,13 @@ async function audit() {
 
 // ---------- wiring ----------
 function wireControls() {
-  document.querySelectorAll("#format-seg button").forEach((b) => b.onclick = () => { state.format = b.dataset.format; render(); });
-  document.querySelectorAll("#mode-seg button").forEach((b) => b.onclick = () => { state.mode = b.dataset.mode; if (state.mode === "record") { state.loop = false; state.hardOnly = false; } render(); });
+  // The stage changes size with the format, so the format is locked during a take.
+  document.querySelectorAll("#format-seg button").forEach((b) => b.onclick = () => { if (rec.recorder) return; state.format = b.dataset.format; render(); });
+  document.querySelectorAll("#mode-seg button").forEach((b) => b.onclick = () => {
+    state.mode = b.dataset.mode;
+    if (state.mode === "record") { state.loop = false; state.hardOnly = false; } else if (rec.recorder) stopTake();
+    render();
+  });
   $("#book-pick").onchange = (e) => { goTo(e.target.value, chapterNums(e.target.value)[0], 1); e.target.blur(); };
   $("#chapter-pick").onchange = (e) => { goTo(state.book, +e.target.value, 1); e.target.blur(); };
   $("#btn-next").onclick = () => step(1);
@@ -570,6 +736,8 @@ function wireControls() {
   $("#btn-attempt-reset").onclick = () => { const s = sectionOf(state.book, state.ch, verse().v); store.set(attemptKey(s), 0); render(); };
   $("#debug").onchange = (e) => { state.debug = e.target.checked; render(); };
   $("#notes").oninput = (e) => store.set(noteKey(), e.target.value);
+  $("#btn-rec").onclick = toggleTake;
+  $("#mic-pick").onchange = (e) => { switchMic(e.target.value); e.target.blur(); };
   $("#btn-csv").onclick = exportCsv;
   $("#btn-txt").onclick = exportTxt;
   $("#btn-audit").onclick = audit;
@@ -603,6 +771,7 @@ function wireControls() {
       r: reset, R: reset,
       "/": () => { search.focus(); search.select(); },
     };
+    if (state.mode === "record") act.Enter = toggleTake;
     if (state.mode === "practice") Object.assign(act, {
       h: toggleHard, H: toggleHard,
       l: () => { state.loop = !state.loop; render(); }, L: () => { state.loop = !state.loop; render(); },

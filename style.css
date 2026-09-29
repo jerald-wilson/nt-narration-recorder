@@ -228,3 +228,19 @@ body.record #panel { background: #FBF4F2; }
    The light gray page around the stage still shows where the stage ends. */
 body.record .stage { outline: none; }
 body.record #mode-seg button[data-mode="record"] { background: #b91c1c; border-color: #b91c1c; }
+
+/* Built-in recorder (Record mode only). */
+body:not(.record) .record-only { display: none; }
+.rec-status { font-size: 14px; margin-bottom: 8px; }
+.rec-status.warn { color: #7f1d1d; }
+.rec-btn { width: 100%; padding: 10px; font-size: 15px; font-weight: 600; }
+body.recording .rec-btn { background: #b91c1c; border-color: #b91c1c; color: #fff; }
+body.recording #panel { box-shadow: inset 6px 0 0 #b91c1c; }
+.rec-status .dot { color: #b91c1c; font-weight: 700; }
+body.recording .rec-status .dot { animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+.mic-line { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.mic-line select { flex: 1; min-width: 0; }
+.meter { width: 90px; height: 10px; background: #e3e0da; border-radius: 5px; overflow: hidden; }
+#mic-level { height: 100%; width: 0; background: #3a7a2a; transition: width .08s linear; }
+#rec-takes { margin-top: 8px; }

@@ -21,6 +21,16 @@
     <div id="loading">Loading data/nt.json…</div>
     <div id="capture" class="capture"></div>
 
+    <div class="group record-only" id="rec">
+      <div id="rec-status" class="rec-status">Press <b>Enter</b> to connect the recorder.</div>
+      <button id="btn-rec" class="rec-btn">Connect recorder (Enter)</button>
+      <div class="mic-line">
+        <select id="mic-pick" aria-label="Microphone"><option value="">Default microphone</option></select>
+        <div class="meter" title="Microphone level"><div id="mic-level"></div></div>
+      </div>
+      <div id="rec-takes" class="hint"></div>
+    </div>
+
     <div class="group">
       <div class="seg" id="format-seg" role="group" aria-label="Format">
         <button data-format="section">Section <small>9:16</small></button>
@@ -102,6 +112,7 @@
       <dl>
         <dt>Space → PageDown</dt><dd>next verse</dd>
         <dt>← PageUp</dt><dd>previous verse</dd>
+        <dt>Enter</dt><dd>start / stop a take (Record)</dd>
         <dt>S</dt><dd>start / stop timer</dd>
         <dt>R</dt><dd>reset to chapter start</dd>
         <dt>H</dt><dd>mark verse hard (Practice)</dd>

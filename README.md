@@ -22,14 +22,18 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 
 1. Pick **Section** or **Full video**, then **Record**.
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
-3. Start a screen recording of the stage (the paper-colored box only), read, and press Space for each verse.
-   Don't use full screen: it hides the menu bar's Stop button. Stop with ⏹ in the menu bar.
-4. Flubs: pause, re-read the sentence, keep going. Cut it later in the editor.
+3. Press **Enter** to connect the built-in recorder (Chrome). Chrome asks once per session to share
+   this tab and to use the microphone; allow both. Pick your mic in the panel and check its level meter.
+4. Press **Enter** to start a take, read, press Space for each verse, and press **Enter** to stop.
+   The video is cropped to the stage and saves to Downloads (`MRK-4-1-section-take1.mp4`; WebM on
+   older Chrome). Full screen is fine. The recorder needs Chrome; in other browsers, use a screen recorder.
+5. Flubs: pause, re-read the sentence, keep going. Cut it later in the editor.
 
 | Key | Action |
 |---|---|
 | Space, →, PageDown | next verse (works with a USB presenter clicker) |
 | ←, PageUp | previous verse |
+| Enter | connect the recorder, then start / stop a take (Record) |
 | S | start / stop timer |
 | R | reset to chapter start |
 | H / L | mark hard / loop verse (Practice) |
