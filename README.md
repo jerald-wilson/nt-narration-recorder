@@ -43,6 +43,11 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 **Exports** (control panel): `sections-BOOK-CH.csv` (titles, descriptions, lengths for each section
 video) and `sections-BOOK-CH.txt` (the chapter's section list, ready for YouTube chapter times).
 
+**All descriptions at once:** [`video-descriptions.txt`](video-descriptions.txt) has the title and
+description for every chapter video and every section video in the New Testament. Search it for a
+chapter (`MARK 4`). Rebuild it with `node scripts/build-descriptions.js` after changing `config.js` or
+the data.
+
 ## Settings
 
 Everything is in [`config.js`](config.js): translation order, manuscript labels, words per minute,
@@ -60,6 +65,7 @@ Standard Bible downloads don't include headings). To rename, add, or remove one,
 ```sh
 scripts/fetch-sources.sh      # downloads raw sources into data/raw/
 node scripts/build-data.js    # writes data/nt.json and prints the report
+node scripts/build-descriptions.js  # writes video-descriptions.txt
 ```
 
 The report (also saved to `data/build-report.txt`) lists flagged verses, the longest verses, section
