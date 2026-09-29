@@ -24,6 +24,7 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
 3. Press **Enter** to connect the built-in recorder (Chrome). Chrome asks once per session to share
    this tab and to use the microphone; allow both. Pick your mic in the panel and check its level meter.
+   Turn on Do Not Disturb first: the recorder takes no computer audio, but the mic hears the speakers.
 4. Press **Enter** to start a take, read, press Space for each verse, and press **Enter** to stop.
    The video is cropped to the stage and saves to Downloads (`MRK-4-1-section-take1.mp4`; WebM on
    older Chrome). Full screen is fine. The recorder needs Chrome; in other browsers, use a screen recorder.

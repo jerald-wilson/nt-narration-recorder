@@ -285,7 +285,8 @@ function recStatus(html, warn) {
 function recIdle() {
   const on = !!rec.video;
   $("#btn-rec").textContent = on ? "Start take (Enter)" : "Connect recorder (Enter)";
-  recStatus(on ? `Connected. Press <b>Enter</b> to start a take.` : `Press <b>Enter</b> to connect the recorder.`);
+  // The mic hears the iMac's speakers, so alert sounds end up in the take unless macOS is silenced.
+  recStatus(on ? `Connected. Press <b>Enter</b> to start a take.<br><small>Turn on Do Not Disturb (Control Center, top right) so alerts don't sound while you read.</small>` : `Press <b>Enter</b> to connect the recorder.`);
 }
 
 async function micStream() {
