@@ -237,6 +237,56 @@ function translationsHTML() {
   return `<div class="slide-rows"><div>Read from the <b>${esc(C.names[C.readRow])}</b> · ${esc(C.manuscripts[C.readRow])}</div>` +
     `<div class="k">Compared with</div>` + comps.map((r) => `<div>${esc(C.names[r])} · ${esc(C.manuscripts[r])}</div>`).join("") + `</div>`;
 }
+const ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
+  "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth", "twentieth"];
+const ordinal = (n) => n <= 20 ? ORDINALS[n - 1] : "twenty-" + ORDINALS[n - 21];
+// Closing line in the manner of an old Bible: "Here ends the fourth chapter of the Gospel according to Matthew."
+function colophon(b, c) {
+  const t = C.bookTitles[b] || bookName(b);
+  const chs = chapterNums(b);
+  return chs.length === 1 || c === chs.at(-1) ? `Here ends ${t}.` : `Here ends the ${ordinal(c)} chapter of ${t}.`;
+}
+// Where chapter c of b falls among all New Testament chapters: [number, total].
+function chapterPlace(b, c) {
+  let n = 0, total = 0;
+  for (const x of DB.order) for (const y of chapterNums(x)) { total++; if (x === b && y === c) n = total; }
+  return [n, total];
+}
+// One segment per book, as wide as its chapter count, filled up to chapter c of b.
+function journeyHTML(b, c) {
+  const bi = DB.order.indexOf(b);
+  return `<div class="journey">` + DB.order.map((x, i) => {
+    const n = chapterNums(x).length;
+    const fill = i < bi ? 100 : i > bi ? 0 : (chapterNums(x).indexOf(c) + 1) / n * 100;
+    return `<i style="flex:${n};--p:${fill}%"></i>`;
+  }).join("") + `</div>`;
+}
+// Full-video outro, laid out around YouTube's end screen: the recommended video sits bottom left
+// (under "Up next") and the subscribe button bottom right (under the progress), so both stay clear.
+function outroFullHTML(b, c) {
+  const n = nextChapter(b, c);
+  const [num, total] = chapterPlace(b, c);
+  const next = n
+    ? `<div class="eyebrow">Up next</div><div class="next-title"><span class="book">${esc(bookName(n[0]))}</span> ${n[1]}</div>` +
+      `<div class="next-sub">${esc(sectionsTouching(n[0], n[1])[0].heading)}</div>`
+    : `<div class="eyebrow">The New Testament</div><div class="next-title">Complete</div>`;
+  return `<div class="colophon">${esc(colophon(b, c))}</div><div class="orn"><i></i></div>` +
+    `<div class="outro-cols"><div class="outro-next">${next}</div>` +
+    `<div class="outro-journey"><div class="count">${num} of ${total} chapters</div>${journeyHTML(b, c)}` +
+    `<div class="follow">Subscribe to hear the whole New Testament</div></div></div>`;
+}
+function outroSectionHTML(b, s) {
+  const n = SECTIONS[b][SECTIONS[b].indexOf(s) + 1];
+  return `<div class="colophon">${esc(fullRef(b, s))}</div><div class="orn"><i></i></div>` +
+    (n ? `<div class="eyebrow">Up next</div><div class="next-title">${esc(n.heading)}</div><div class="next-sub">${esc(bookName(b))} ${rangeStr(n)}</div>` : "");
+}
+// What to say while the outro is up, so the end screen isn't silent.
+function outroLine(b, c) {
+  const n = nextChapter(b, c);
+  return n ? `That's ${bookName(b)} ${c}. Up next is ${bookName(n[0])} ${n[1]}, ${sectionsTouching(n[0], n[1])[0].heading.replace(/^The /, "the ")}.`
+    : `That's ${bookName(b)} ${c}, and the end of the New Testament.`;
+}
+
 // Intro and outro slides.
 function paintSlide(el, fmt, kind, b, c, v) {
   el.dataset.format = fmt;
@@ -248,16 +298,7 @@ function paintSlide(el, fmt, kind, b, c, v) {
       : `<div class="eyebrow">${esc(bookName(b))} ${rangeStr(s)}</div><h1 class="slide-title">${esc(s.heading)}</h1>`;
     html += translationsHTML();
   } else {
-    let next = "";
-    if (fmt === "full") {
-      const n = nextChapter(b, c);
-      next = n ? `Next: ${esc(bookName(n[0]))} ${n[1]} · ${esc(sectionsTouching(n[0], n[1])[0].heading)}` : "";
-    } else {
-      const n = SECTIONS[b][SECTIONS[b].indexOf(s) + 1];
-      next = n ? `Next: ${esc(n.heading)} · ${esc(bookName(b))} ${rangeStr(n)}` : "";
-    }
-    html = `<div class="eyebrow">${fmt === "full" ? `${esc(bookName(b))} ${c}` : `${esc(bookName(b))} ${rangeStr(s)}`}</div>` +
-      `<h1 class="slide-title">${esc(C.outroText)}</h1>` + (next ? `<div class="next">${next}</div>` : "");
+    html = fmt === "full" ? outroFullHTML(b, c) : outroSectionHTML(b, s);
   }
   el.innerHTML = `<div class="area slide ${kind}">${html}</div><div class="debug"></div>`;
 }
@@ -565,6 +606,9 @@ function renderPanel(v) {
 
   // Next verse preview (read translation)
   const nv = state.slide === "outro" ? null : list[state.i + (state.slide === "intro" ? 0 : 1)];
+  if (state.slide === "outro" && state.format === "full") {
+    $("#next-preview").innerHTML = `<b>Say:</b> “${esc(outroLine(state.book, state.ch))}”`;
+  } else
   $("#next-preview").innerHTML = nv
     ? `<b>Next ${nv.v}:</b> ${esc(nv[C.readRow] || "(not in " + C.names[C.readRow] + ")")}`
     : `<b>End of chapter.</b>`;

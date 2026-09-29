@@ -49,7 +49,22 @@ const CONFIG = {
   // frame below its text empty for YouTube's end screen (subscribe button, recommended video).
   // YouTube Shorts can't have end screens, so Section videos have no slides unless added here.
   slides: { full: ["intro", "outro"], section: [] },
-  outroText: "Thank you for listening",
+  // Book titles for the outro's closing line ("Here ends the fourth chapter of the Gospel according to Matthew.").
+  bookTitles: {
+    MAT: "the Gospel according to Matthew", MRK: "the Gospel according to Mark",
+    LUK: "the Gospel according to Luke", JHN: "the Gospel according to John",
+    ACT: "the Acts of the Apostles", ROM: "the Epistle of Paul to the Romans",
+    "1CO": "the First Epistle of Paul to the Corinthians", "2CO": "the Second Epistle of Paul to the Corinthians",
+    GAL: "the Epistle of Paul to the Galatians", EPH: "the Epistle of Paul to the Ephesians",
+    PHP: "the Epistle of Paul to the Philippians", COL: "the Epistle of Paul to the Colossians",
+    "1TH": "the First Epistle of Paul to the Thessalonians", "2TH": "the Second Epistle of Paul to the Thessalonians",
+    "1TI": "the First Epistle of Paul to Timothy", "2TI": "the Second Epistle of Paul to Timothy",
+    TIT: "the Epistle of Paul to Titus", PHM: "the Epistle of Paul to Philemon",
+    HEB: "the Epistle to the Hebrews", JAS: "the Epistle of James",
+    "1PE": "the First Epistle of Peter", "2PE": "the Second Epistle of Peter",
+    "1JN": "the First Epistle of John", "2JN": "the Second Epistle of John", "3JN": "the Third Epistle of John",
+    JUD: "the Epistle of Jude", REV: "the Revelation of Jesus Christ",
+  },
   // Seconds the outro stays up before the take stops itself. YouTube end screens run 5–20 seconds.
   // 0 = don't stop; press Enter.
   outroSeconds: 10,
