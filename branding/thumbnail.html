@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thumbnail</title>
+<!-- YouTube thumbnail, 1280 × 720. Rendered to PNGs by branding/thumbnails.sh.
+     Chapter:   ?ref=MAT+5                      (hook = the chapter's first section heading; &hook= overrides)
+     Explainer: ?title=Missing+verses&kicker=Why+some+Bibles+skip+Acts+8:37   (&greek= sets the background)
+     Open over http (python3 -m http.server), not from Finder: Chrome blocks file pages from reading the data. -->
+<link rel="stylesheet" href="../style.css">
+<style>
+  @font-face { font-family: "Gentium Book Plus"; src: url(../fonts/gentium-book-plus-greek-400-normal.woff2) format("woff2"); unicode-range: U+0370-03FF; }
+  html, body { margin: 0; background: none; }
+  .t { position: relative; width: 1280px; height: 720px; overflow: hidden; background: var(--accent); color: var(--bg); font-family: var(--sans); }
+  /* The book's Greek title, large and faint, bleeding off the bottom right. */
+  .greek { position: absolute; right: -30px; bottom: -30px; text-align: right; white-space: nowrap;
+           font: 400 210px/0.88 "Gentium Book Plus", serif; letter-spacing: .04em; color: rgba(245, 241, 232, .065); }
+  .badge { position: absolute; left: 64px; top: 56px; width: 150px; height: 150px; border-radius: 50%;
+           box-shadow: 0 0 0 6px var(--accent), 0 0 0 8px rgba(245, 241, 232, .35); }
+  .body { position: absolute; left: 64px; top: 236px; right: 64px; }
+  .ref { font: 600 180px/0.95 var(--serif); letter-spacing: -.01em; white-space: nowrap; }
+  .hook { font: 600 76px/1.08 var(--sans); color: #F0E3D6; margin-top: 22px; max-width: 1100px; text-wrap: balance; }
+  .rule { width: 120px; height: 4px; background: #C9A27E; margin-top: 34px; }
+</style>
+</head>
+<body class="theme-vellum">
+<div id="t" class="t"></div>
+<script src="../config.js"></script>
+<script>
+// Book titles as the Greek manuscripts give them, spelled as in the Majority Text.
+const GREEK = {
+  MAT: "ΚΑΤΑ ΜΑΤΘΑΙΟΝ", MRK: "ΚΑΤΑ ΜΑΡΚΟΝ", LUK: "ΚΑΤΑ ΛΟΥΚΑΝ", JHN: "ΚΑΤΑ ΙΩΑΝΝΗΝ", ACT: "ΠΡΑΞΕΙΣ",
+  ROM: "ΠΡΟΣ ΡΩΜΑΙΟΥΣ", "1CO": "ΠΡΟΣ ΚΟΡΙΝΘΙΟΥΣ Α", "2CO": "ΠΡΟΣ ΚΟΡΙΝΘΙΟΥΣ Β", GAL: "ΠΡΟΣ ΓΑΛΑΤΑΣ",
+  EPH: "ΠΡΟΣ ΕΦΕΣΙΟΥΣ", PHP: "ΠΡΟΣ ΦΙΛΙΠΠΗΣΙΟΥΣ", COL: "ΠΡΟΣ ΚΟΛΟΣΣΑΕΙΣ", "1TH": "ΠΡΟΣ ΘΕΣΣΑΛΟΝΙΚΕΙΣ Α",
+  "2TH": "ΠΡΟΣ ΘΕΣΣΑΛΟΝΙΚΕΙΣ Β", "1TI": "ΠΡΟΣ ΤΙΜΟΘΕΟΝ Α", "2TI": "ΠΡΟΣ ΤΙΜΟΘΕΟΝ Β", TIT: "ΠΡΟΣ ΤΙΤΟΝ",
+  PHM: "ΠΡΟΣ ΦΙΛΗΜΟΝΑ", HEB: "ΠΡΟΣ ΕΒΡΑΙΟΥΣ", JAS: "ΙΑΚΩΒΟΥ", "1PE": "ΠΕΤΡΟΥ Α", "2PE": "ΠΕΤΡΟΥ Β",
+  "1JN": "ΙΩΑΝΝΟΥ Α", "2JN": "ΙΩΑΝΝΟΥ Β", "3JN": "ΙΩΑΝΝΟΥ Γ", JUD: "ΙΟΥΔΑ", REV: "ΑΠΟΚΑΛΥΨΙΣ ΙΩΑΝΝΟΥ",
+};
+const q = new URLSearchParams(location.search);
+if (!q.get("ref") && !q.get("title")) q.set("ref", "MAT 5"); // a sample when opened bare
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const t = document.getElementById("t");
+
+// Shrink one line of text until it fits its box.
+function fitLine(el, max) { let s = parseFloat(getComputedStyle(el).fontSize); while (el.scrollWidth > max && s > 40) el.style.fontSize = (s -= 4) + "px"; }
+
+function paint(title, hook, greek) {
+  t.innerHTML = `<div class="greek">${greek.split(" ").map(esc).join("<br>")}</div>` +
+    `<img class="badge" src="profile-i-800.png" alt="">` +
+    `<div class="body"><div class="ref">${title}</div>${hook ? `<div class="hook">${esc(hook)}</div>` : ""}<div class="rule"></div></div>`;
+  document.fonts.ready.then(() => { fitLine(t.querySelector(".ref"), 1152); document.body.dataset.ready = "1"; });
+}
+
+if (q.get("title")) {
+  paint(esc(q.get("title")), q.get("kicker") || "", q.get("greek") || "ΒΙΒΛΟΣ");
+} else {
+  fetch("../data/nt.json").then((r) => r.json()).then((DB) => {
+    const [b, c] = q.get("ref").toUpperCase().split(/[ +]/);
+    const vs = DB.books[b].chapters[c];
+    // Hook: the chapter's first section heading.
+    const hook = q.get("hook") || vs.find((x) => x.heading)?.heading || DB.books[b].name;
+    paint(`${esc(DB.books[b].name)} ${c}`, hook, GREEK[b] || "ΒΙΒΛΟΣ");
+  }).catch(() => {
+    // Opened from Finder (file://): Chrome won't let the page read data/nt.json.
+    t.innerHTML = `<div style="padding:64px;font:600 34px/1.4 var(--sans)">Can't load the Bible data from a file.<br>` +
+      `<span style="font-weight:400;font-size:28px">In Terminal, in the project folder, run <b>python3 -m http.server 8000</b>, then open ` +
+      `<b>localhost:8000/branding/thumbnail.html?ref=MAT+5</b></span></div>`;
+  });
+}
+</script>
+</body>
+</html>

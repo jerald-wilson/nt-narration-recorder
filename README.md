@@ -53,6 +53,13 @@ description for every chapter video and every section video in the New Testament
 chapter (`MARK 4`). Rebuild it with `node scripts/build-descriptions.js` after changing `config.js` or
 the data.
 
+## Thumbnails
+
+`branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/` (not committed):
+`branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260, or
+`--title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"` for an explainer. The design is
+`branding/thumbnail.html`: the chapter, its first section heading, and the book's Greek title behind.
+
 ## Password
 
 The hosted page asks for a password (a nuisance filter, not security: the source is readable). Set or
