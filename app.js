@@ -17,12 +17,11 @@ let DB = null;          // { order, books: { MAT: { name, chapters: { "1": [vers
 let SECTIONS = {};      // book -> [{ heading, start:[c,v], end:[c,v], words }]
 const state = {
   book: "MAT", ch: 1, i: 0,
-  format: "section", mode: "practice",
-  debug: false, loop: false, hardOnly: false,
+  format: "section",
+  debug: false,
   slide: null,          // "intro" | "outro" | null (a verse)
 };
 const slideOn = (kind) => (C.slides[state.format] || []).includes(kind);
-const timer = { running: false, start: 0, acc: 0, id: 0 };
 
 const chapter = () => DB.books[state.book].chapters[state.ch];
 const verse = () => chapter()[state.i];
@@ -54,10 +53,9 @@ function init() {
   if (last && DB.books[last.book]) {
     const btn = $("#resume");
     btn.hidden = false;
-    btn.textContent = `Resume last position: ${refStr(last.book, last.ch, last.v)} · ${last.format === "full" ? "Full video" : "Section"} · ${last.mode === "record" ? "Record" : "Practice"}`;
+    btn.textContent = `Resume last position: ${refStr(last.book, last.ch, last.v)} · ${last.format === "full" ? "Full video" : "Section"}`;
     btn.onclick = () => {
       state.format = last.format || "section";
-      state.mode = last.mode || "practice";
       goTo(last.book, last.ch, last.v);
       btn.hidden = true;
     };
@@ -106,15 +104,6 @@ function goTo(b, c, v) {
 }
 
 function step(dir) {
-  if (!state.slide && state.loop && state.mode === "practice") { render(); return; }
-  if (!state.slide && state.hardOnly && state.mode === "practice") {
-    const hard = hardVerses();
-    if (!hard.length) return;
-    const curV = verse().v;
-    const nextV = dir > 0 ? hard.find((v) => v > curV) ?? hard[0] : [...hard].reverse().find((v) => v < curV) ?? hard[hard.length - 1];
-    goTo(state.book, state.ch, nextV);
-    return;
-  }
   // Slides sit before a chapter's first verse and after its last: intro, verses, outro, next intro.
   if ((state.slide === "intro" && dir > 0) || (state.slide === "outro" && dir < 0)) { state.slide = null; render(); return; }
   if (!state.slide && dir > 0 && state.i === chapter().length - 1 && slideOn("outro")) { state.slide = "outro"; render(); return; }
@@ -276,8 +265,7 @@ function paintSlide(el, fmt, kind, b, c, v) {
 function render() {
   if (!DB) return;
   const v = verse();
-  document.body.classList.toggle("record", state.mode === "record");
-  if (state.mode === "record") state.debug = false;
+  if (rec.recorder) state.debug = false; // never record the margin overlay
   stage.classList.toggle("show-debug", state.debug);
   $("#debug").checked = state.debug;
 
@@ -292,7 +280,7 @@ function render() {
   renderPanel(v);
   checkCapture();
   markVerse();
-  store.set("pos", { book: state.book, ch: state.ch, v: v.v, format: state.format, mode: state.mode });
+  store.set("pos", { book: state.book, ch: state.ch, v: v.v, format: state.format });
 }
 
 // ---------- capture check: browser zoom, stage cut off, recorded size ----------
@@ -324,7 +312,7 @@ window.addEventListener("resize", () => { if (DB) checkCapture(); });
 // Enter connects once per session (Chrome asks to share this tab, and for the mic), then starts
 // and stops takes. Chrome's Region Capture crops the tab to #stage, so no selection box.
 // Each take downloads when it stops.
-const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, takes: 0, ctx: null, meter: 0 };
+const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, takes: 0, ctx: null, meter: 0, outroAt: 0, discardArmed: 0 };
 const REC_TYPES = ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm"];
 
 function recStatus(html, warn) {
@@ -446,6 +434,7 @@ async function startTake() {
   const format = state.format;
   const marks = rec.marks = [];
   r.onstop = () => {
+    if (r.discarded) return;
     const blob = new Blob(rec.chunks, { type: r.mimeType });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -470,7 +459,9 @@ async function startTake() {
     const outro = rec.outroAt ? (Date.now() - rec.outroAt) / 1000 : -1;
     // The outro holds for C.outroSeconds, then the take stops itself.
     if (outro >= 0 && C.outroSeconds && outro >= C.outroSeconds) { stopTake(); return; }
+    const armed = Date.now() - rec.discardArmed < 3000;
     recStatus(`<span class="dot">●</span> Recording ${fmtTime((Date.now() - rec.started) / 1000)}${size} · <b>Enter</b> stops` +
+      (armed ? `<br><b>Press Backspace again to throw this take away.</b>` : "") +
       (outro >= 0 ? `<br>Outro ${Math.floor(outro)}s${C.outroSeconds ? ` · stops by itself at ${C.outroSeconds}s` : " · YouTube end screens need at least 5s"}` : ""));
   };
   show();
@@ -518,6 +509,18 @@ function takeDescription(format, marks, seconds) {
   return `Title:\n${chapterTitle(b, c)}\n\nDescription:\n${chapterDescription(stamps)}\n` + (notes.length ? `\n(${notes.join(" ")})\n` : "");
 }
 
+// Backspace twice (within 3 seconds) throws the take away unsaved and goes back to the intro.
+function discardTake() {
+  if (!rec.recorder) return;
+  if (Date.now() - rec.discardArmed >= 3000) { rec.discardArmed = Date.now(); return; }
+  rec.discardArmed = 0;
+  rec.recorder.discarded = true;
+  stopTake();
+  rec.takes--;
+  reset();
+  recStatus(`Take thrown away. Press <b>Enter</b> to start again.`);
+}
+
 let recBusy = false;
 async function toggleTake() {
   if (recBusy) return;
@@ -533,7 +536,6 @@ window.addEventListener("beforeunload", (e) => { if (rec.recorder) e.preventDefa
 // ---------- panel ----------
 function renderPanel(v) {
   document.querySelectorAll("#format-seg button").forEach((b) => b.classList.toggle("on", b.dataset.format === state.format));
-  document.querySelectorAll("#mode-seg button").forEach((b) => b.classList.toggle("on", b.dataset.mode === state.mode));
   $("#book-pick").value = state.book;
   const cp = $("#chapter-pick");
   if (cp.dataset.book !== state.book) {
@@ -569,63 +571,12 @@ function renderPanel(v) {
 
   // Chapter estimate
   const words = list.reduce((n, x) => n + countWords(x[C.readRow] || ""), 0);
-  $("#chapter-est").textContent = `chapter about ${fmtTime((words / C.wordsPerMinute) * 60)} at ${C.wordsPerMinute} words/min`;
+  $("#chapter-est").textContent = `Chapter about ${fmtTime((words / C.wordsPerMinute) * 60)} at ${C.wordsPerMinute} words/min`;
 
-  // Notes
-  const notes = $("#notes");
-  if (document.activeElement !== notes) notes.value = store.get(noteKey(), "");
-
-  // Practice
-  const hard = hardVerses();
-  $("#btn-hard").classList.toggle("on", hard.includes(v.v));
-  $("#btn-hard").textContent = hard.includes(v.v) ? "Hard ✓ (H)" : "Mark hard (H)";
-  $("#btn-loop").classList.toggle("on", state.loop);
-  $("#btn-loop").textContent = state.loop ? "Looping (L)" : "Loop verse (L)";
-  $("#hard-only").checked = state.hardOnly;
-  $("#hard-list").innerHTML = hard.length
-    ? `Hard verses: ` + hard.map((n) => `<a data-v="${n}">${state.ch}:${n}</a>`).join("")
-    : `<span class="hint">No hard verses marked in this chapter.</span>`;
-  const hint = $("#practice-hint");
-  hint.hidden = !hard.length;
-  hint.textContent = `Practice first: ${hard.length} hard verse${hard.length > 1 ? "s" : ""} in this chapter.`;
-  $("#attempts").textContent = store.get(attemptKey(s), 0);
 }
 
-const noteKey = () => `note.${state.book}.${state.ch}.${verse().v}`;
-const hardKey = () => `hard.${state.book}.${state.ch}`;
-const attemptKey = (s) => `attempts.${state.book}.${s.start[0]}.${s.start[1]}`;
-const hardVerses = () => store.get(hardKey(), []);
-function toggleHard() {
-  const v = verse().v;
-  const hard = hardVerses();
-  const i = hard.indexOf(v);
-  if (i >= 0) hard.splice(i, 1); else hard.push(v);
-  store.set(hardKey(), hard.sort((a, b) => a - b));
-  render();
-}
-
-// ---------- timer ----------
-function toggleTimer() {
-  if (timer.running) {
-    timer.acc += Date.now() - timer.start;
-    timer.running = false;
-    clearInterval(timer.id);
-  } else {
-    timer.start = Date.now();
-    timer.running = true;
-    timer.id = setInterval(showTimer, 250);
-  }
-  showTimer();
-}
-function showTimer() {
-  const ms = timer.acc + (timer.running ? Date.now() - timer.start : 0);
-  $("#timer").textContent = fmtTime(ms / 1000);
-  $("#btn-timer").textContent = timer.running ? "Stop (S)" : "Start (S)";
-  $("#btn-timer").classList.toggle("on", timer.running);
-}
+// ---------- navigation helpers ----------
 function reset() {
-  timer.running = false; timer.acc = 0; clearInterval(timer.id);
-  showTimer();
   state.i = 0;
   state.slide = slideOn("intro") ? "intro" : null;
   render();
@@ -827,25 +778,12 @@ async function audit() {
 function wireControls() {
   // The stage changes size with the format, so the format is locked during a take.
   document.querySelectorAll("#format-seg button").forEach((b) => b.onclick = () => { if (rec.recorder) return; state.format = b.dataset.format; render(); });
-  document.querySelectorAll("#mode-seg button").forEach((b) => b.onclick = () => {
-    state.mode = b.dataset.mode;
-    if (state.mode === "record") { state.loop = false; state.hardOnly = false; } else if (rec.recorder) stopTake();
-    render();
-  });
   $("#book-pick").onchange = (e) => { goTo(e.target.value, chapterNums(e.target.value)[0], 1); e.target.blur(); };
   $("#chapter-pick").onchange = (e) => { goTo(state.book, +e.target.value, 1); e.target.blur(); };
   $("#btn-next").onclick = () => step(1);
   $("#btn-prev").onclick = () => step(-1);
-  $("#btn-timer").onclick = toggleTimer;
   $("#btn-reset").onclick = reset;
-  $("#btn-hard").onclick = toggleHard;
-  $("#btn-loop").onclick = () => { state.loop = !state.loop; render(); };
-  $("#hard-only").onchange = (e) => { state.hardOnly = e.target.checked; render(); };
-  $("#hard-list").onclick = (e) => { const v = e.target.dataset.v; if (v) goTo(state.book, state.ch, +v); };
-  $("#btn-attempt").onclick = () => { const s = sectionOf(state.book, state.ch, verse().v); store.set(attemptKey(s), store.get(attemptKey(s), 0) + 1); render(); };
-  $("#btn-attempt-reset").onclick = () => { const s = sectionOf(state.book, state.ch, verse().v); store.set(attemptKey(s), 0); render(); };
   $("#debug").onchange = (e) => { state.debug = e.target.checked; render(); };
-  $("#notes").oninput = (e) => store.set(noteKey(), e.target.value);
   $("#btn-rec").onclick = toggleTake;
   $("#mic-pick").onchange = (e) => { switchMic(e.target.value); e.target.blur(); };
   $("#btn-csv").onclick = exportCsv;
@@ -860,7 +798,7 @@ function wireControls() {
   $("#results").onmousedown = (e) => { const r = e.target.closest(".r"); if (r) { e.preventDefault(); pickResult(+r.dataset.i); } };
   search.onblur = () => setTimeout(() => { if (document.activeElement !== search) $("#results").hidden = true; }, 150);
 
-  // Keys work regardless of focus (except while typing in search or notes).
+  // Keys work regardless of focus (except while typing in search).
   window.addEventListener("keydown", (e) => {
     if (!DB) return;
     const t = e.target;
@@ -871,21 +809,16 @@ function wireControls() {
       else if (e.key === "Enter") { e.preventDefault(); pickResult(sel); }
       return;
     }
-    if (t.tagName === "TEXTAREA") { if (e.key === "Escape") t.blur(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
     const act = {
       " ": () => step(1), ArrowRight: () => step(1), PageDown: () => step(1),
       ArrowLeft: () => step(-1), PageUp: () => step(-1),
-      s: toggleTimer, S: toggleTimer,
       r: reset, R: reset,
       "/": () => { search.focus(); search.select(); },
+      Enter: toggleTake,
+      Backspace: discardTake,
     };
-    if (state.mode === "record") act.Enter = toggleTake;
-    if (state.mode === "practice") Object.assign(act, {
-      h: toggleHard, H: toggleHard,
-      l: () => { state.loop = !state.loop; render(); }, L: () => { state.loop = !state.loop; render(); },
-    });
     if (act[k]) {
       e.preventDefault();
       if (t.tagName === "SELECT" || t.tagName === "BUTTON" || t.tagName === "INPUT") t.blur();

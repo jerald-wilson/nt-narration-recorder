@@ -20,7 +20,7 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 
 ## Record
 
-1. Pick **Section** or **Full video**, then **Record**.
+1. Pick **Section** or **Full video**.
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
 3. Press **Enter** to connect the built-in recorder (Chrome). Chrome asks once per session to share
    this tab and to use the microphone; allow both. Pick your mic in the panel and check its level meter.
@@ -31,20 +31,21 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
    **Enter** to stop sooner. Full videos have both slides; set `slides` and `outroSeconds` in `config.js`.
    The video is cropped to the stage and saves to Downloads (`MRK-4-1-section-take1.mp4`; WebM on
    older Chrome), with a matching `.txt` holding its title and description. For a Full video the
-   description's chapter times come from when you pressed Space, so there's nothing to fill in. Full screen is fine. The recorder needs Chrome; in other browsers, use a screen recorder.
-5. Flubs: pause, re-read the sentence, keep going. Cut it later in the editor.
+   description's chapter times come from when you pressed Space, so there's nothing to fill in.
+   Full screen is fine. The recorder needs Chrome.
+5. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over
+   instead, press **Backspace twice**: the take is thrown away unsaved and you're back at the intro.
 
 | Key | Action |
 |---|---|
 | Space, →, PageDown | next verse (works with a USB presenter clicker) |
 | ←, PageUp | previous verse |
-| Enter | connect the recorder, then start / stop a take (Record) |
-| S | start / stop timer |
+| Enter | connect the recorder, then start / stop a take |
+| Backspace twice | throw the take away and go back to the intro |
 | R | back to chapter start (the intro slide) |
-| H / L | mark hard / loop verse (Practice) |
 | / and Esc | search / leave search |
 
-**Exports** (control panel): `sections-BOOK-CH.csv` (titles, descriptions, lengths for each section
+**Exports** (under Exports and layout tools in the panel): `sections-BOOK-CH.csv` (titles, descriptions, lengths for each section
 video) and `sections-BOOK-CH.txt` (the chapter's section list, ready for YouTube chapter times).
 
 **All descriptions at once:** [`video-descriptions.txt`](video-descriptions.txt) has the title and

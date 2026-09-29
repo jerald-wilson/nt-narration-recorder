@@ -21,7 +21,7 @@
     <div id="loading">Loading data/nt.json…</div>
     <div id="capture" class="capture"></div>
 
-    <div class="group record-only" id="rec">
+    <div class="group" id="rec">
       <div id="rec-status" class="rec-status">Press <b>Enter</b> to connect the recorder.</div>
       <button id="btn-rec" class="rec-btn">Connect recorder (Enter)</button>
       <div class="mic-line">
@@ -35,10 +35,6 @@
       <div class="seg" id="format-seg" role="group" aria-label="Format">
         <button data-format="section">Section <small>9:16</small></button>
         <button data-format="full">Full video <small>16:9</small></button>
-      </div>
-      <div class="seg" id="mode-seg" role="group" aria-label="Mode">
-        <button data-mode="practice">Practice</button>
-        <button data-mode="record">Record</button>
       </div>
     </div>
 
@@ -67,58 +63,33 @@
         <button id="btn-next" class="primary" title="Space, → or PageDown">Next</button>
       </div>
       <div class="buttons">
-        <button id="btn-timer" title="S">Start</button>
-        <button id="btn-reset" title="R">Reset</button>
+        <button id="btn-reset" title="R">Start of chapter (R)</button>
       </div>
-      <div class="timer-line"><span id="timer">0:00</span> elapsed · <span id="chapter-est"></span></div>
-    </div>
-
-    <div class="group practice-only">
-      <h3>Practice</h3>
-      <div class="buttons">
-        <button id="btn-hard" title="H">Mark hard</button>
-        <button id="btn-loop" title="L">Loop verse</button>
-      </div>
-      <label class="check"><input type="checkbox" id="hard-only"> Drill hard verses only</label>
-      <div id="practice-hint" class="hint" hidden></div>
-      <div id="hard-list"></div>
-      <div class="attempts">Section attempts: <span id="attempts">0</span>
-        <button id="btn-attempt" class="small">+1</button><button id="btn-attempt-reset" class="small">Clear</button></div>
-    </div>
-
-    <div class="group">
-      <h3>Notes for this verse</h3>
-      <textarea id="notes" rows="3" placeholder="Pronunciation reminders, pauses…"></textarea>
-    </div>
-
-    <div class="group">
-      <h3>Export this chapter</h3>
-      <div class="buttons">
-        <button id="btn-csv">Sections CSV</button>
-        <button id="btn-txt">Chapter timestamps TXT</button>
-      </div>
-    </div>
-
-    <div class="group practice-only">
-      <h3>Layout</h3>
-      <label class="check"><input type="checkbox" id="debug"> Show unsafe margins</label>
-      <div id="fit-info" class="hint"></div>
-      <button id="btn-audit">Layout audit (all verses)</button>
-      <div id="audit-out"></div>
+      <div class="hint" id="chapter-est"></div>
     </div>
 
     <details class="group keys">
       <summary>Keyboard</summary>
       <dl>
+        <dt>Enter</dt><dd>connect the recorder, then start / stop a take</dd>
+        <dt>Backspace ×2</dt><dd>throw away the take and go back to the intro</dd>
         <dt>Space → PageDown</dt><dd>next verse</dd>
         <dt>← PageUp</dt><dd>previous verse</dd>
-        <dt>Enter</dt><dd>start / stop a take (Record)</dd>
-        <dt>S</dt><dd>start / stop timer</dd>
-        <dt>R</dt><dd>back to chapter start (intro slide)</dd>
-        <dt>H</dt><dd>mark verse hard (Practice)</dd>
-        <dt>L</dt><dd>loop verse (Practice)</dd>
+        <dt>R</dt><dd>start of chapter (intro slide)</dd>
         <dt>/</dt><dd>search · Esc leaves</dd>
       </dl>
+    </details>
+
+    <details class="group more">
+      <summary>Exports and layout tools</summary>
+      <div class="buttons">
+        <button id="btn-csv">Sections CSV</button>
+        <button id="btn-txt">Chapter timestamps TXT</button>
+      </div>
+      <label class="check"><input type="checkbox" id="debug"> Show unsafe margins</label>
+      <div id="fit-info" class="hint"></div>
+      <button id="btn-audit">Layout audit (all verses)</button>
+      <div id="audit-out"></div>
     </details>
   </aside>
 </div>

@@ -47,8 +47,6 @@ body {
   background: var(--bg);
   color: var(--main);
   cursor: none;
-  outline: 1px solid rgba(0, 0, 0, .25);
-  outline-offset: 0;
   -webkit-font-smoothing: antialiased;
 }
 .stage * { cursor: none; }
@@ -156,7 +154,7 @@ body {
 #panel {
   flex: 1; min-width: 340px; max-width: 460px;
   padding: 20px 20px 60px;
-  background: #F7F7F5;
+  background: #FBF4F2;
   min-height: 100vh;
   border-left: 1px solid #c9c6bf;
 }
@@ -175,7 +173,7 @@ body {
 .capture .stop-tip.warn { background: #b91c1c; }
 .group { margin-bottom: 18px; }
 .group h3 { font-size: 12px; text-transform: none; color: #555; margin: 0 0 6px; font-weight: 600; }
-button, select, input, textarea { font: inherit; }
+button, select, input { font: inherit; }
 button {
   border: 1px solid #b9b5ad; background: #fff; border-radius: 6px;
   padding: 6px 12px; cursor: pointer; color: #1d1d1f;
@@ -218,16 +216,10 @@ select { padding: 5px; border-radius: 6px; border: 1px solid #b9b5ad; background
 .section-info .warn, .hint.warn { color: #9a3412; }
 .next { margin-top: 8px; color: #555; font-size: 13px; }
 .next b { color: #333; }
-.timer-line { color: #444; }
-#timer { font-variant-numeric: tabular-nums; font-weight: 600; }
 .hint { font-size: 12px; color: #555; margin: 6px 0; }
-#hard-list { font-size: 13px; margin: 6px 0; }
-#hard-list a { color: #6E2419; margin-right: 8px; cursor: pointer; text-decoration: underline; }
-.attempts { font-size: 13px; color: #444; }
-textarea { width: 100%; border: 1px solid #b9b5ad; border-radius: 6px; padding: 6px 8px; resize: vertical; }
 #audit-out { font-size: 12px; margin-top: 6px; max-height: 240px; overflow: auto; }
 #audit-out a { color: #6E2419; cursor: pointer; }
-.keys summary { cursor: pointer; font-size: 13px; color: #555; }
+.keys summary, .more summary { cursor: pointer; font-size: 13px; color: #555; }
 .keys dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 12px; margin: 6px 0 0; }
 .keys dt { font-weight: 600; }
 .keys dd { margin: 0; color: #555; }
@@ -235,18 +227,8 @@ textarea { width: 100%; border: 1px solid #b9b5ad; border-radius: 6px; padding: 
 /* ?stage=only: just the stage, for screenshots (banner, thumbnails). */
 body.stage-only #panel { display: none; }
 body.stage-only #stage-wrap { padding: 0; }
-body.stage-only .stage { outline: none; }
 
-/* Record mode hides practice helpers. */
-body.record .practice-only { display: none; }
-body.record #panel { background: #FBF4F2; }
-/* No outline while recording: a selection box a pixel too big would capture it.
-   The light gray page around the stage still shows where the stage ends. */
-body.record .stage { outline: none; }
-body.record #mode-seg button[data-mode="record"] { background: #b91c1c; border-color: #b91c1c; }
-
-/* Built-in recorder (Record mode only). */
-body:not(.record) .record-only { display: none; }
+/* Built-in recorder */
 .rec-status { font-size: 14px; margin-bottom: 8px; }
 .rec-status.warn { color: #7f1d1d; }
 .rec-btn { width: 100%; padding: 10px; font-size: 15px; font-weight: 600; }
