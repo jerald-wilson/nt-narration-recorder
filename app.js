@@ -237,15 +237,6 @@ function translationsHTML() {
   return `<div class="slide-rows"><div>Read from the <b>${esc(C.names[C.readRow])}</b> · ${esc(C.manuscripts[C.readRow])}</div>` +
     `<div class="k">Compared with</div>` + comps.map((r) => `<div>${esc(C.names[r])} · ${esc(C.manuscripts[r])}</div>`).join("") + `</div>`;
 }
-const ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
-  "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth", "twentieth"];
-const ordinal = (n) => n <= 20 ? ORDINALS[n - 1] : "twenty-" + ORDINALS[n - 21];
-// Closing line in the manner of an old Bible: "Here ends the fourth chapter of the Gospel according to Matthew."
-function colophon(b, c) {
-  const t = C.bookTitles[b] || bookName(b);
-  const chs = chapterNums(b);
-  return chs.length === 1 || c === chs.at(-1) ? `Here ends ${t}.` : `Here ends the ${ordinal(c)} chapter of ${t}.`;
-}
 // Where chapter c of b falls among all New Testament chapters: [number, total].
 function chapterPlace(b, c) {
   let n = 0, total = 0;
@@ -270,15 +261,13 @@ function outroFullHTML(b, c) {
     ? `<div class="eyebrow">Up next</div><div class="next-title"><span class="book">${esc(bookName(n[0]))}</span> ${n[1]}</div>` +
       `<div class="next-sub">${esc(sectionsTouching(n[0], n[1])[0].heading)}</div>`
     : `<div class="eyebrow">The New Testament</div><div class="next-title">Complete</div>`;
-  return `<div class="colophon">${esc(colophon(b, c))}</div><div class="orn"><i></i></div>` +
-    `<div class="outro-cols"><div class="outro-next">${next}</div>` +
+  return `<div class="outro-cols"><div class="outro-next">${next}</div>` +
     `<div class="outro-journey"><div class="count">${num} of ${total} chapters</div>${journeyHTML(b, c)}` +
     `<div class="follow">Subscribe to hear the whole New Testament</div></div></div>`;
 }
 function outroSectionHTML(b, s) {
   const n = SECTIONS[b][SECTIONS[b].indexOf(s) + 1];
-  return `<div class="colophon">${esc(fullRef(b, s))}</div><div class="orn"><i></i></div>` +
-    (n ? `<div class="eyebrow">Up next</div><div class="next-title">${esc(n.heading)}</div><div class="next-sub">${esc(bookName(b))} ${rangeStr(n)}</div>` : "");
+  return (n ? `<div class="eyebrow">Up next</div><div class="next-title">${esc(n.heading)}</div><div class="next-sub">${esc(bookName(b))} ${rangeStr(n)}</div>` : "");
 }
 // What to say while the outro is up, so the end screen isn't silent.
 function outroLine(b, c) {

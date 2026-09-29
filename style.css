@@ -140,21 +140,18 @@ body {
 .stage .slide-rows .k { margin-top: 12px; }
 /* Outro. Full video: YouTube's end screen puts the recommended video bottom left and the
    subscribe button bottom right (about y 281–458 and x 795–938 on the 960 × 540 stage). */
-.stage .colophon { font-family: var(--serif); font-size: 26px; line-height: 1.3; color: var(--sub); max-width: 34em; }
-.stage .orn { display: flex; align-items: center; gap: 10px; margin: 14px 0 18px; width: 120px; }
-.stage .orn::before, .stage .orn::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
-.stage .orn i { width: 8px; height: 8px; background: var(--accent); transform: rotate(45deg); }
 .stage .next-title { font-family: var(--serif); font-weight: 600; font-size: 40px; line-height: 1.08; color: var(--main); margin-top: 2px; }
 .stage .next-title .book { color: var(--accent); }
 .stage .next-sub { font-family: var(--sans); font-size: 18px; line-height: 1.35; color: var(--label); margin-top: 4px; }
-.stage .outro-cols { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
+.stage .outro-cols { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
 .stage .outro-next { flex: 1; min-width: 0; }
 .stage .outro-journey { width: 330px; text-align: right; padding-top: 4px; }
 .stage .outro-journey .count { font-family: var(--serif); font-weight: 600; font-size: 22px; color: var(--main); }
 .stage .journey { display: flex; gap: 2px; height: 8px; margin: 10px 0 8px; }
 .stage .journey i { display: block; background: linear-gradient(90deg, var(--accent) var(--p), var(--rule) var(--p)); }
 .stage .outro-journey .follow { font-family: var(--sans); font-size: 15px; color: var(--label); }
-.stage[data-format="full"] .slide.outro { top: 40px; }
+/* Bottom-aligned just above the end-screen elements, so each label sits over its element. */
+.stage[data-format="full"] .slide.outro { top: 40px; bottom: 285px; justify-content: flex-end; }
 
 /* Debug overlay: shades everything outside the safe area. */
 .stage .debug {
