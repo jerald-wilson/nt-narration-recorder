@@ -51,7 +51,8 @@ const CONFIG = {
   titleMax: 100,
   titles: {
     section: ["{heading} | {ref} | MSB with KJV, BLB & BBE", "{heading} | {ref}"],
-    chapter: ["{book} {chapter} | Read Aloud | MSB with KJV, BLB & BBE"],
+    chapter: ["{book} {chapter} | Full chapter reading | Majority Standard Bible compared with three translations",
+      "{book} {chapter} | Full chapter reading | MSB with KJV, BLB & BBE"],
   },
 
   // Attribution lines added to every description. All four are public domain.

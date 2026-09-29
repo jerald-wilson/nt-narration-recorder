@@ -242,6 +242,7 @@ function render() {
 
   renderPanel(v);
   checkCapture();
+  markVerse();
   store.set("pos", { book: state.book, ch: state.ch, v: v.v, format: state.format, mode: state.mode });
 }
 
@@ -393,6 +394,8 @@ async function startTake() {
   const name = `${state.book}-${state.ch}-${v.v}-${state.format}-take${++rec.takes}.${type.startsWith("video/mp4") ? "mp4" : "webm"}`;
   rec.chunks = [];
   r.ondataavailable = (e) => { if (e.data.size) rec.chunks.push(e.data); };
+  const format = state.format;
+  const marks = rec.marks = [];
   r.onstop = () => {
     const blob = new Blob(rec.chunks, { type: r.mimeType });
     const a = document.createElement("a");
@@ -400,12 +403,15 @@ async function startTake() {
     a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
-    const mins = fmtTime((Date.now() - started) / 1000);
-    $("#rec-takes").innerHTML = `Saved <b>${esc(name)}</b> (${mins}, ${(blob.size / 1e6).toFixed(0)} MB) to Downloads.<br>` + $("#rec-takes").innerHTML;
+    const secs = (Date.now() - started) / 1000;
+    const txt = name.replace(/\.\w+$/, ".txt");
+    download(txt, takeDescription(format, marks, secs), "text/plain;charset=utf-8");
+    $("#rec-takes").innerHTML = `Saved <b>${esc(name)}</b> (${fmtTime(secs)}, ${(blob.size / 1e6).toFixed(0)} MB) and <b>${esc(txt)}</b> to Downloads.<br>` + $("#rec-takes").innerHTML;
   };
   r.start(1000); // a chunk per second, so a crash loses little
   rec.recorder = r;
   rec.started = started;
+  markVerse();
   document.body.classList.add("recording");
   $("#mic-pick").disabled = true;
   $("#btn-rec").textContent = "Stop take (Enter)";
@@ -423,6 +429,33 @@ function stopTake() {
   document.body.classList.remove("recording");
   $("#mic-pick").disabled = false;
   recIdle();
+}
+
+// Each verse shown during a take, with seconds from the start of the take.
+function markVerse() {
+  if (!rec.recorder) return;
+  const v = verse(), last = rec.marks.at(-1);
+  if (last && last.b === state.book && last.c === state.ch && last.v === v.v) return;
+  rec.marks.push({ t: (Date.now() - rec.started) / 1000, b: state.book, c: state.ch, v: v.v });
+}
+
+// Title and description for a finished take, with YouTube chapter times from the verse marks.
+function takeDescription(format, marks, seconds) {
+  const { b, c, v } = marks[0];
+  if (format === "section") {
+    const s = sectionOf(b, c, v);
+    const isShort = seconds <= C.shortMaxSeconds;
+    return `Title:\n${sectionTitle(b, s)}\n\nDescription:\n${sectionDescription(b, s, isShort)}\n\n` +
+      `(${fmtTime(seconds)} long: ${isShort ? "publishes as a Short. Set its Related video to the chapter video." : `over ${fmtTime(C.shortMaxSeconds)}, so it publishes as a regular vertical video, not a Short.`})\n`;
+  }
+  // First time each section's opening verse was on screen. A section never shown keeps ??:??.
+  const stamps = chapterTimestamps(b, c, (s, from) => marks.find((m) => m.b === b && m.c === from[0] && m.v === from[1])?.t ?? null);
+  const notes = [];
+  if (stamps.some((x) => x.t == null)) notes.push("Some sections weren't reached in this take: their times are ??:??.");
+  if (stamps.length < 3) notes.push("YouTube shows chapter markers only with 3 or more timestamps; this chapter has " + stamps.length + ". The times still work as links in the description.");
+  const known = [...stamps.map((x) => x.t).filter((t) => t != null), seconds];
+  if (known.some((t, i) => i && t - known[i - 1] < 10)) notes.push("A section is under 10 seconds, so YouTube won't show chapter markers.");
+  return `Title:\n${chapterTitle(b, c)}\n\nDescription:\n${chapterDescription(stamps)}\n` + (notes.length ? `\n(${notes.join(" ")})\n` : "");
 }
 
 let recBusy = false;
@@ -643,39 +676,50 @@ const chapterTitle = (b, c) => title(C.titles.chapter, { book: bookName(b), chap
 const sectionsStartingIn = (b, c) => SECTIONS[b].filter((s) => s.start[0] === +c);
 const sectionsTouching = (b, c) => SECTIONS[b].filter((s) => s.start[0] <= c && s.end[0] >= c);
 
+const readLine = () => `Read from the ${C.names[C.readRow]}, shown with the ${joinNames(C.rows.filter((r) => r !== C.readRow).map((r) => C.names[r]))} for comparison.`;
+const sectionTitle = (b, s) => title(C.titles.section, { heading: s.heading, ref: fullRef(b, s), book: bookName(b), chapter: s.start[0] });
+function sectionDescription(b, s, isShort) {
+  const c = s.start[0];
+  return [
+    `${s.heading} — ${fullRef(b, s)}`,
+    readLine(),
+    isShort ? `Full chapter: ${bookName(b)} ${c} (linked as the Related video).` : `Full chapter: ${bookName(b)} ${c} — [add link to the chapter video].`,
+    "",
+    ...C.attribution,
+  ].join("\n");
+}
+// Chapter list for a chapter video. startAt(s) gives a section's start in seconds, or null if unknown.
+function chapterTimestamps(b, c, startAt = () => null) {
+  const verses = DB.books[b].chapters[c];
+  return sectionsTouching(b, c).map((s, i) => {
+    const from = s.start[0] < c ? [c, verses[0].v] : s.start;
+    const to = s.end[0] > c ? [c, verses.at(-1).v] : s.end;
+    const t = i === 0 ? 0 : startAt(s, from);
+    const stamp = t == null ? "??:??" : `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+    return { t, line: `${stamp} ${s.heading} (${from[0]}:${from[1]}–${to[1]})` };
+  });
+}
+const chapterDescription = (stamps) => [...stamps.map((x) => x.line), "", readLine(), "", ...C.attribution].join("\n");
+
 function exportCsv() {
   const b = state.book, c = state.ch;
   const rows = [["Heading", "Verse range", "Estimated length", "Publishes as", "Title", "Description", "Chapter video"]];
   for (const s of sectionsStartingIn(b, c)) {
     const secs = secSeconds(s);
     const isShort = secs <= C.shortMaxSeconds;
-    const ref = fullRef(b, s);
-    const desc = [
-      `${s.heading} — ${ref}`,
-      `Read from the ${C.names[C.readRow]}, shown with the ${joinNames(C.rows.filter((r) => r !== C.readRow).map((r) => C.names[r]))} for comparison.`,
-      isShort ? `Full chapter: ${bookName(b)} ${c} (linked as the Related video).` : `Full chapter: ${bookName(b)} ${c} — [add link to the chapter video].`,
-      "",
-      ...C.attribution,
-    ].join("\n");
-    rows.push([s.heading, ref, fmtTime(secs), isShort ? "Short" : "Vertical video (over 3:00)", title(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c }), desc, chapterTitle(b, c)]);
+    rows.push([s.heading, fullRef(b, s), fmtTime(secs), isShort ? "Short" : "Vertical video (over 3:00)", sectionTitle(b, s), sectionDescription(b, s, isShort), chapterTitle(b, c)]);
   }
   download(`sections-${b}-${c}.csv`, "﻿" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n", "text/csv;charset=utf-8");
 }
 function exportTxt() {
   const b = state.book, c = state.ch;
-  const list = sectionsTouching(b, c);
   const lines = [
     chapterTitle(b, c),
     "",
     "Add start times after assembling the chapter video. YouTube chapters need: first timestamp 00:00, at least 3 timestamps in ascending order, each chapter at least 10 seconds long.",
     "",
   ];
-  list.forEach((s, i) => {
-    const from = s.start[0] < c ? [c, DB.books[b].chapters[c][0].v] : s.start;
-    const to = s.end[0] > c ? [c, DB.books[b].chapters[c].at(-1).v] : s.end;
-    lines.push(`${i === 0 ? "00:00" : "??:??"} ${s.heading} (${from[0]}:${from[1]}–${to[1]})`);
-  });
-  lines.push("", `Read from the ${C.names[C.readRow]}, shown with the ${joinNames(C.rows.filter((r) => r !== C.readRow).map((r) => C.names[r]))} for comparison.`, "", ...C.attribution);
+  lines.push(chapterDescription(chapterTimestamps(b, c)));
   lines.push("", "Section videos from this chapter:");
   for (const s of sectionsStartingIn(b, c)) lines.push(`  ${s.heading} (${fullRef(b, s)}) — ${secSeconds(s) <= C.shortMaxSeconds ? "Short: set Related video to this chapter" : "Vertical video: link this chapter in its description"}`);
   download(`sections-${b}-${c}.txt`, lines.join("\n") + "\n", "text/plain;charset=utf-8");
