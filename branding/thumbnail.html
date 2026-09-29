@@ -5,6 +5,7 @@
 <title>Thumbnail</title>
 <!-- YouTube thumbnail, 1280 × 720. Rendered to PNGs by branding/thumbnails.sh.
      Chapter:   ?ref=MAT+5                      (hook = the chapter's first section heading; &hook= overrides)
+     Book:      ?book=MAT                       (a playlist cover; hook = "All 28 chapters")
      Explainer: ?title=Missing+verses&kicker=Why+some+Bibles+skip+Acts+8:37   (&greek= sets the background)
      Open over http (python3 -m http.server), not from Finder: Chrome blocks file pages from reading the data. -->
 <link rel="stylesheet" href="../style.css">
@@ -37,7 +38,7 @@ const GREEK = {
   "1JN": "ΙΩΑΝΝΟΥ Α", "2JN": "ΙΩΑΝΝΟΥ Β", "3JN": "ΙΩΑΝΝΟΥ Γ", JUD: "ΙΟΥΔΑ", REV: "ΑΠΟΚΑΛΥΨΙΣ ΙΩΑΝΝΟΥ",
 };
 const q = new URLSearchParams(location.search);
-if (!q.get("ref") && !q.get("title")) q.set("ref", "MAT 5"); // a sample when opened bare
+if (!q.get("ref") && !q.get("title") && !q.get("book")) q.set("ref", "MAT 5"); // a sample when opened bare
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const t = document.getElementById("t");
 
@@ -55,6 +56,11 @@ if (q.get("title")) {
   paint(esc(q.get("title")), q.get("kicker") || "", q.get("greek") || "ΒΙΒΛΟΣ");
 } else {
   fetch("../data/nt.json").then((r) => r.json()).then((DB) => {
+    if (q.get("book")) {
+      const b = q.get("book").toUpperCase(), n = Object.keys(DB.books[b].chapters).length;
+      paint(esc(DB.books[b].name), q.get("hook") || (n > 1 ? `All ${n} chapters` : "The whole book"), GREEK[b] || "ΒΙΒΛΟΣ");
+      return;
+    }
     const [b, c] = q.get("ref").toUpperCase().split(/[ +]/);
     const vs = DB.books[b].chapters[c];
     // Hook: the chapter's first section heading.

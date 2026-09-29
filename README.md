@@ -56,7 +56,8 @@ the data.
 ## Thumbnails
 
 `branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/` (not committed):
-`branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260, or
+`branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260, `--books` for
+a playlist cover per book (`book-MAT.png`; `--books MAT JHN` for some), or
 `--title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"` for an explainer. The design is
 `branding/thumbnail.html`: the chapter, its first section heading, and the book's Greek title behind.
 

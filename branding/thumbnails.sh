@@ -4,6 +4,8 @@
 #   branding/thumbnails.sh "MAT 5" "JHN 3"      chapters             -> thumbnails/MAT-5.png, JHN-3.png
 #   branding/thumbnails.sh MAT                  a whole book
 #   branding/thumbnails.sh                      all 260 chapters (a few minutes)
+#   branding/thumbnails.sh --books              a playlist cover per book -> thumbnails/book-MAT.png, ...
+#   branding/thumbnails.sh --books MAT JHN      just those books
 #   branding/thumbnails.sh --title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"
 #                                               an explainer video   -> thumbnails/missing-verses.png
 set -e
@@ -23,6 +25,16 @@ shot() { # output query. Headless Chrome occasionally stalls, so each render get
   echo "FAILED: thumbnails/$1 (run it again on its own)"
 }
 enc() { node -e 'process.stdout.write(encodeURIComponent(process.argv[1]))' "$1"; }
+
+if [ "$1" = "--books" ]; then
+  shift
+  for B in ${@:-$(node -e 'console.log(require("./data/nt.json").order.join(" "))')}; do
+    B=$(printf %s "$B" | tr '[:lower:]' '[:upper:]')
+    node -e 'if (!require("./data/nt.json").books[process.argv[1]]) { console.error("Unknown book: " + process.argv[1]); process.exit(1); }' "$B"
+    shot "book-$B.png" "book=$B"
+  done
+  exit
+fi
 
 if [ "$1" = "--title" ]; then
   TITLE="$2"; shift 2
