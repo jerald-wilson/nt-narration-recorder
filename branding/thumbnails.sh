@@ -12,11 +12,15 @@ ROOT="$PWD"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 mkdir -p thumbnails
 
-shot() { # output query
-  perl -e 'alarm 40; exec @ARGV' "$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
-    --allow-file-access-from-files --virtual-time-budget=5000 --window-size=1280,720 \
-    --screenshot="$ROOT/thumbnails/$1" "file://$ROOT/branding/thumbnail.html?$2" 2>/dev/null
-  echo "thumbnails/$1"
+shot() { # output query. Headless Chrome occasionally stalls, so each render gets 40 seconds and 3 tries.
+  for try in 1 2 3; do
+    if perl -e 'alarm 40; exec @ARGV' "$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+      --allow-file-access-from-files --virtual-time-budget=5000 --window-size=1280,720 \
+      --screenshot="$ROOT/thumbnails/$1" "file://$ROOT/branding/thumbnail.html?$2" 2>/dev/null; then
+      echo "thumbnails/$1"; return 0
+    fi
+  done
+  echo "FAILED: thumbnails/$1 (run it again on its own)"
 }
 enc() { node -e 'process.stdout.write(encodeURIComponent(process.argv[1]))' "$1"; }
 
