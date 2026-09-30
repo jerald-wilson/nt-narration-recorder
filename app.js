@@ -355,23 +355,22 @@ const TARGET = { section: [1080, 1920], full: [1920, 1080] };
 function checkCapture() {
   const el = $("#capture");
   const problems = [];
-  // Browser zoom scales devicePixelRatio. Macs are 1x or 2x (Retina), so anything else means zoom.
-  const dpr = window.devicePixelRatio || 1;
-  if (dpr !== 1 && dpr !== 2) problems.push(`Browser zoom is about ${Math.round((dpr / 2) * 100)}%. Press <b>Cmd+0</b> to reset it to 100% before recording.`);
   const r = stage.getBoundingClientRect();
   const cutBottom = Math.ceil(r.bottom - window.innerHeight), cutRight = Math.ceil(r.right - window.innerWidth);
   if (cutBottom > 0 || cutRight > 0) {
     const where = [cutBottom > 0 && `bottom by ${cutBottom}px`, cutRight > 0 && `right by ${cutRight}px`].filter(Boolean).join(" and ");
     problems.push(`The stage is cut off at the ${where}. Make the window bigger or go full screen (<b>Ctrl+Cmd+F</b>).`);
   }
+  // The recorder scales a sharper screen down to the delivery size, but can't scale a coarser one up.
+  // So the only size problem is a stage with fewer screen pixels than the target (browser zoom
+  // below 100%, or a display that isn't Retina). More pixels than the target is fine.
+  const dpr = window.devicePixelRatio || 1;
   const w = Math.round(stage.offsetWidth * dpr), h = Math.round(stage.offsetHeight * dpr);
   const [tw, th] = TARGET[state.format];
-  const sizeOk = w === tw && h === th;
-  if (!sizeOk && !problems.length) problems.push(`The stage will record at ${w} × ${h}, not ${tw} × ${th}. Either the browser zoom is 50% (press <b>Cmd+0</b>) or this window is on a display that isn't Retina; move it to the iMac's built-in screen.`);
+  if (w < tw || h < th) problems.push(`The stage has only ${w} × ${h} screen pixels, so it would record smaller than ${tw} × ${th}. ` +
+    `Press <b>Cmd+0</b> in case the page is zoomed out, or move this window to a Retina display.`);
   el.className = "capture" + (problems.length ? " bad" : "");
-  el.innerHTML = problems.length
-    ? problems.map((p) => `<p>${p}</p>`).join("") + (sizeOk ? "" : `<p>Records at ${w} × ${h} right now (should be ${tw} × ${th}).</p>`)
-    : `Ready to record: stage records at ${w} × ${h}.`;
+  el.innerHTML = problems.length ? problems.map((p) => `<p>${p}</p>`).join("") : `Ready to record at ${tw} × ${th}.`;
 }
 window.addEventListener("resize", () => { if (DB) checkCapture(); });
 
