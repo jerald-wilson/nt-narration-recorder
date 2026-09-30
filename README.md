@@ -22,26 +22,27 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 
 1. Pick **Section** or **Full video**.
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
-3. Press **Enter** to connect the built-in recorder (Chrome). Chrome asks once per session to share
-   this tab and to use the microphone; allow both. Pick your mic in the panel and check its level meter.
+3. Press **Enter** to choose the folder takes are saved in (once; Chrome remembers it, and may ask
+   to allow it again on a later visit). Press **Enter** again to connect the recorder: Chrome asks to
+   share this tab and to use the microphone; allow both. Pick your mic and check its level meter.
    Turn on Do Not Disturb first: the recorder takes no computer audio, but the mic hears the speakers.
 4. Press **R** for the chapter's intro slide, then **Enter** to start a take. Read, pressing Space for
    each verse. Space after the last verse shows the outro slide, which leaves room for YouTube's end
-   screen (subscribe button and a recommended video); the take stops itself 10 seconds later, or press
-   **Enter** to stop sooner. Full videos have both slides; set `slides` and `outroSeconds` in `config.js`.
-   The video is cropped to the stage and saves to Downloads (`MRK-4-1-section-take1.mp4`; WebM on
-   older Chrome), with a matching `.txt` holding its title and description. For a Full video the
-   description's chapter times come from when you pressed Space, so there's nothing to fill in.
-   Full screen is fine. The recorder needs Chrome.
-5. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over
-   instead, press **Backspace twice**: the take is thrown away unsaved and you're back at the intro.
+   screen; the take stops itself 10 seconds later, or press **Enter** to stop sooner.
+5. Each take is written into the folder with a `.txt` of its title and description
+   (`MAT-5-1-full-take1.mp4`; the take number is the first one free in the folder, so nothing is
+   overwritten). The panel lists the session's takes: **✓ Saved** only once the files are checked on
+   disk; a failed save stays in memory with **Save again**. **Discard** (click twice) deletes a take.
+6. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over,
+   press **Backspace twice**: during a take it's thrown away unsaved; between takes it deletes the
+   one just finished. Either way you're back at the intro.
 
 | Key | Action |
 |---|---|
 | Space, →, PageDown | next verse (works with a USB presenter clicker) |
 | ←, PageUp | previous verse |
 | Enter | connect the recorder, then start / stop a take |
-| Backspace twice | throw the take away and go back to the intro |
+| Backspace twice | throw away the take in progress, or delete the one just finished |
 | R | back to chapter start (the intro slide) |
 | / and Esc | search / leave search |
 

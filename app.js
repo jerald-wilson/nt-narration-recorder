@@ -377,8 +377,9 @@ window.addEventListener("resize", () => { if (DB) checkCapture(); });
 // ---------- built-in recorder (Chrome): the stage only, plus the microphone ----------
 // Enter connects once per session (Chrome asks to share this tab, and for the mic), then starts
 // and stops takes. Chrome's Region Capture crops the tab to #stage, so no selection box.
-// Each take downloads when it stops.
-const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, takes: 0, ctx: null, meter: 0, outroAt: 0, discardArmed: 0 };
+// Each take is written, with its description, into a folder you pick once (see "recordings folder").
+const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, ctx: null, meter: 0, outroAt: 0, discardArmed: 0,
+  dir: null, list: [] };
 const REC_TYPES = ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm"];
 
 function recStatus(html, warn) {
@@ -388,9 +389,120 @@ function recStatus(html, warn) {
 }
 function recIdle() {
   const on = !!rec.video;
-  $("#btn-rec").textContent = on ? "Start take (Enter)" : "Connect recorder (Enter)";
+  $("#btn-rec").textContent = on ? "Start take (Enter)" : rec.dir ? "Connect recorder (Enter)" : "Choose recordings folder (Enter)";
+  if (!rec.dir && !on) { recStatus(`Press <b>Enter</b> to choose the folder your takes are saved in.`); return; }
   // The mic hears the iMac's speakers, so alert sounds end up in the take unless macOS is silenced.
   recStatus(on ? `Connected. Press <b>Enter</b> to start a take.<br><small>Turn on Do Not Disturb (Control Center, top right) so alerts don't sound while you read.</small>` : `Press <b>Enter</b> to connect the recorder.`);
+}
+
+// ---------- recordings folder ----------
+// Takes are written straight into a folder you pick (Chrome's File System Access), not downloaded:
+// downloads can be blocked silently, and a page can't check or delete them. Chrome remembers the
+// folder (kept in IndexedDB) and may ask again to allow it on a later visit.
+function kv(mode, fn) {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open("ntr", 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("kv");
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const tx = open.result.transaction("kv", mode), req = fn(tx.objectStore("kv"));
+      tx.oncomplete = () => resolve(req.result);
+      tx.onerror = () => reject(tx.error);
+    };
+  });
+}
+// The folder from last time, if Chrome still allows writing to it without asking.
+async function restoreFolder() {
+  try {
+    const dir = await kv("readonly", (st) => st.get("folder"));
+    if (dir && await dir.queryPermission({ mode: "readwrite" }) === "granted") rec.dir = dir;
+  } catch { /* no saved folder */ }
+  showFolder();
+}
+// Needs a click or key press: may show Chrome's folder picker or its "allow" prompt.
+async function chooseFolder(fresh) {
+  if (!window.showDirectoryPicker) { recStatus("Saving takes to a folder needs Google Chrome.", true); return false; }
+  try {
+    let dir = fresh ? null : await kv("readonly", (st) => st.get("folder")).catch(() => null);
+    if (dir && await dir.requestPermission({ mode: "readwrite" }) !== "granted") dir = null;
+    if (!dir) dir = await window.showDirectoryPicker({ id: "recordings", mode: "readwrite", startIn: "downloads" });
+    await kv("readwrite", (st) => st.put(dir, "folder"));
+    rec.dir = dir;
+    showFolder();
+    return true;
+  } catch { recStatus("No folder chosen. Press <b>Enter</b> to pick one.", true); return false; }
+}
+function showFolder() {
+  $("#rec-folder").innerHTML = rec.dir
+    ? `Saving to the <b>${esc(rec.dir.name)}</b> folder · <a id="rec-folder-change">Change</a>`
+    : `No recordings folder chosen yet.`;
+  const ch = $("#rec-folder-change");
+  if (ch) ch.onclick = () => { if (!rec.recorder) chooseFolder(true).then(recIdle); };
+}
+async function exists(name) {
+  try { await rec.dir.getFileHandle(name); return true; } catch { return false; }
+}
+async function writeFile(name, data) {
+  const fh = await rec.dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  await w.write(data);
+  await w.close();
+  const size = data instanceof Blob ? data.size : new Blob([data]).size;
+  if ((await fh.getFile()).size !== size) throw new Error("the file on disk is the wrong size");
+}
+
+// Saves a finished take and its description, checking both are really on disk. Until then the
+// take stays in memory, listed with "Save again".
+async function saveTake(t) {
+  t.status = "saving";
+  drawTakes();
+  try {
+    if (!rec.dir || await rec.dir.queryPermission({ mode: "readwrite" }) !== "granted") throw new Error("no folder to save into");
+    if (!t.name) { // first free take number for this chapter, so earlier sessions are never overwritten
+      let n = 1;
+      while (await exists(`${t.base}-take${n}.${t.ext}`)) n++;
+      t.name = `${t.base}-take${n}.${t.ext}`;
+    }
+    await writeFile(t.name, t.blob);
+    await writeFile(t.name.replace(/\.\w+$/, ".txt"), t.text);
+    t.status = "saved";
+    t.blob = null; // safely on disk
+  } catch (e) {
+    t.status = "failed";
+    t.error = e.message;
+  }
+  drawTakes();
+}
+
+function drawTakes() {
+  const el = $("#rec-takes");
+  el.innerHTML = rec.list.slice().reverse().map((t) => {
+    const name = esc(t.name || `${t.base}-take?.${t.ext}`);
+    const info = `${fmtTime(t.secs)} · ${(t.size / 1e6).toFixed(0)} MB`;
+    const state = t.status === "saved" ? `<span class="ok">✓ Saved</span>`
+      : t.status === "saving" ? `Saving…`
+      : `<span class="bad">✗ Not saved (${esc(t.error || "")})</span> <button class="small" data-save="${t.id}">Save again</button>`;
+    const del = t.status === "saving" ? "" : `<button class="small" data-discard="${t.id}">${t.confirm ? "Delete it?" : "Discard"}</button>`;
+    return `<div class="take ${t.status}"><div><b>${name}</b> · ${info}</div><div>${state} ${del}</div></div>`;
+  }).join("");
+}
+// Discard asks twice: the first click (or Backspace) arms it for 3 seconds.
+async function discardSaved(t) {
+  if (!t.confirm || Date.now() - t.confirm > 3000) {
+    t.confirm = Date.now();
+    drawTakes();
+    setTimeout(() => { if (t.confirm && Date.now() - t.confirm >= 3000) { t.confirm = 0; drawTakes(); } }, 3100);
+    return false;
+  }
+  if (t.status === "saved") {
+    try {
+      await rec.dir.removeEntry(t.name);
+      await rec.dir.removeEntry(t.name.replace(/\.\w+$/, ".txt")).catch(() => {});
+    } catch (e) { t.confirm = 0; t.status = "saved"; recStatus(`Couldn't delete ${esc(t.name)}: ${esc(e.message)}`, true); drawTakes(); return false; }
+  }
+  rec.list.splice(rec.list.indexOf(t), 1);
+  drawTakes();
+  return true;
 }
 
 async function micStream() {
@@ -435,6 +547,12 @@ function watchMic() {
 async function connectRecorder() {
   if (!navigator.mediaDevices?.getDisplayMedia || !window.CropTarget || !window.MediaRecorder) {
     recStatus("The built-in recorder needs Google Chrome.", true);
+    return;
+  }
+  // The folder comes first, on its own key press: Chrome's pickers each need a fresh one.
+  if (!rec.dir || await rec.dir.queryPermission({ mode: "readwrite" }) !== "granted") {
+    rec.dir = null;
+    if (await chooseFolder()) recStatus(`Takes will be saved in <b>${esc(rec.dir.name)}</b>. Press <b>Enter</b> to connect the recorder.`);
     return;
   }
   recStatus("Chrome is asking to share this tab: choose <b>Allow</b> (or Share).");
@@ -494,23 +612,19 @@ async function startTake() {
     { mimeType: type, videoBitsPerSecond: 12_000_000, audioBitsPerSecond: 192_000 });
   const v = verse();
   const started = Date.now();
-  const name = `${state.book}-${state.ch}-${v.v}-${state.format}-take${++rec.takes}.${type.startsWith("video/mp4") ? "mp4" : "webm"}`;
-  rec.chunks = [];
-  r.ondataavailable = (e) => { if (e.data.size) rec.chunks.push(e.data); };
+  // Named when saved (the take number is the first one free in the folder).
+  const base = `${state.book}-${state.ch}-${v.v}-${state.format}`, ext = type.startsWith("video/mp4") ? "mp4" : "webm";
+  const chunks = rec.chunks = [];
+  r.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
   const format = state.format;
   const marks = rec.marks = [];
   r.onstop = () => {
     if (r.discarded) return;
-    const blob = new Blob(rec.chunks, { type: r.mimeType });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+    const blob = new Blob(chunks, { type: r.mimeType });
     const secs = (Date.now() - started) / 1000;
-    const txt = name.replace(/\.\w+$/, ".txt");
-    download(txt, takeDescription(format, marks, secs), "text/plain;charset=utf-8");
-    $("#rec-takes").innerHTML = `Saved <b>${esc(name)}</b> (${fmtTime(secs)}, ${(blob.size / 1e6).toFixed(0)} MB) and <b>${esc(txt)}</b> to Downloads.<br>` + $("#rec-takes").innerHTML;
+    const t = { id: started, base, ext, blob, size: blob.size, secs, text: takeDescription(format, marks, secs), status: "saving" };
+    rec.list.push(t);
+    saveTake(t);
   };
   r.start(1000); // a chunk per second, so a crash loses little
   rec.recorder = r;
@@ -575,14 +689,21 @@ function takeDescription(format, marks, seconds) {
   return `Title:\n${chapterTitle(b, c)}\n\nDescription:\n${chapterDescription(stamps)}\n` + (notes.length ? `\n(${notes.join(" ")})\n` : "");
 }
 
-// Backspace twice (within 3 seconds) throws the take away unsaved and goes back to the intro.
-function discardTake() {
-  if (!rec.recorder) return;
+// Backspace twice (within 3 seconds): during a take, throws it away unsaved and goes back to the
+// intro; between takes, deletes the take just finished.
+async function discardTake() {
+  if (!rec.recorder) {
+    const t = rec.list.at(-1);
+    if (!t || t.status === "saving") return;
+    const armed = t.confirm && Date.now() - t.confirm <= 3000;
+    if (await discardSaved(t)) { reset(); recStatus(`Deleted ${esc(t.name || "the take")}. Press <b>Enter</b> to start again.`); }
+    else if (!armed) recStatus(`Press <b>Backspace</b> again to delete <b>${esc(t.name || "the last take")}</b>.`, true);
+    return;
+  }
   if (Date.now() - rec.discardArmed >= 3000) { rec.discardArmed = Date.now(); return; }
   rec.discardArmed = 0;
   rec.recorder.discarded = true;
   stopTake();
-  rec.takes--;
   reset();
   recStatus(`Take thrown away. Press <b>Enter</b> to start again.`);
 }
@@ -597,7 +718,7 @@ async function toggleTake() {
     else await startTake();
   } finally { recBusy = false; }
 }
-window.addEventListener("beforeunload", (e) => { if (rec.recorder) e.preventDefault(); });
+window.addEventListener("beforeunload", (e) => { if (rec.recorder || rec.list.some((t) => t.status !== "saved")) e.preventDefault(); });
 
 // ---------- panel ----------
 function renderPanel(v) {
@@ -854,6 +975,14 @@ function wireControls() {
   $("#btn-reset").onclick = reset;
   $("#debug").onchange = (e) => { state.debug = e.target.checked; render(); };
   $("#btn-rec").onclick = toggleTake;
+  $("#rec-takes").onclick = (e) => {
+    const s = e.target.dataset.save, d = e.target.dataset.discard;
+    const t = rec.list.find((x) => String(x.id) === (s || d));
+    if (!t) return;
+    if (s) (rec.dir ? Promise.resolve(true) : chooseFolder()).then((ok) => ok && saveTake(t));
+    else discardSaved(t);
+  };
+  restoreFolder().then(recIdle);
   $("#mic-pick").onchange = (e) => { switchMic(e.target.value); e.target.blur(); };
   $("#btn-csv").onclick = exportCsv;
   $("#btn-txt").onclick = exportTxt;

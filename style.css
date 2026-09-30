@@ -253,7 +253,14 @@ body.recording .rec-status .dot { animation: blink 1s steps(2, start) infinite; 
 .mic-line select { flex: 1; min-width: 0; }
 .meter { width: 90px; height: 10px; background: #e3e0da; border-radius: 5px; overflow: hidden; }
 #mic-level { height: 100%; width: 0; background: #3a7a2a; transition: width .08s linear; }
-#rec-takes { margin-top: 8px; }
+#rec-folder { margin-top: 8px; }
+#rec-folder a { color: #6E2419; cursor: pointer; text-decoration: underline; }
+#rec-takes { margin-top: 8px; display: grid; gap: 6px; }
+.take { font-size: 13px; padding: 6px 8px; border: 1px solid #d9d2c7; border-radius: 6px; background: #fff; }
+.take .ok { color: #2f6a1f; font-weight: 600; }
+.take .bad { color: #b91c1c; font-weight: 600; }
+.take.failed { border-color: #f3b4b4; background: #fde8e8; }
+.take button.small { margin-left: 6px; }
 
 /* Password gate (covers the page until the password is entered). */
 #gate { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; background: #D9D6D0; }
