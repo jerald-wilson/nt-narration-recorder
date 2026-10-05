@@ -458,8 +458,14 @@ function recStatus(html, warn) {
 }
 function recIdle() {
   const on = !!rec.video;
-  $("#btn-rec").textContent = on ? "Start take (Enter)" : rec.dir ? "Connect recorder (Enter)" : "Choose recordings folder (Enter)";
-  if (!rec.dir && !on) { recStatus(`Press <b>Enter</b> to choose the folder your takes are saved in.`); return; }
+  $("#btn-rec").textContent = on ? "Start take (Enter)" : rec.dir ? "Connect recorder (Enter)"
+    : rec.remembered ? `Allow saving to ${rec.remembered} (Enter)` : "Choose recordings folder (Enter)";
+  if (!rec.dir && !on) {
+    recStatus(rec.remembered
+      ? `Chrome asks again on each visit before the app may save to <b>${esc(rec.remembered)}</b>. Press <b>Enter</b>, then choose <b>Allow on every visit</b> so it stops asking.`
+      : `Press <b>Enter</b> to choose the folder your takes are saved in.`);
+    return;
+  }
   // The mic hears the iMac's speakers, so alert sounds end up in the take unless macOS is silenced.
   recStatus(on ? `Connected. Press <b>Enter</b> to start a take.<br><small>Turn on Do Not Disturb (Control Center, top right) so alerts don't sound while you read.</small>` : `Press <b>Enter</b> to connect the recorder.`);
 }
@@ -485,6 +491,7 @@ async function restoreFolder() {
   try {
     const dir = await kv("readonly", (st) => st.get("folder"));
     if (dir && await dir.queryPermission({ mode: "readwrite" }) === "granted") rec.dir = dir;
+    else if (dir) rec.remembered = dir.name; // known, but Chrome wants a click to allow it again
   } catch { /* no saved folder */ }
   showFolder();
 }
@@ -497,6 +504,7 @@ async function chooseFolder(fresh) {
     if (!dir) dir = await window.showDirectoryPicker({ id: "recordings", mode: "readwrite", startIn: "downloads" });
     await kv("readwrite", (st) => st.put(dir, "folder"));
     rec.dir = dir;
+    rec.remembered = "";
     showFolder();
     return true;
   } catch { recStatus("No folder chosen. Press <b>Enter</b> to pick one.", true); return false; }
@@ -504,7 +512,7 @@ async function chooseFolder(fresh) {
 function showFolder() {
   $("#rec-folder").innerHTML = rec.dir
     ? `Saving to <b>${esc(rec.dir.name)} / ${C.readRow.toUpperCase()}</b> (follows the Reading menu) · <a id="rec-folder-change">Change</a>`
-    : `No recordings folder chosen yet.`;
+    : rec.remembered ? `Recordings folder: <b>${esc(rec.remembered)}</b> (waiting for Chrome's permission)` : `No recordings folder chosen yet.`;
   const ch = $("#rec-folder-change");
   if (ch) ch.onclick = () => { if (!rec.recorder) chooseFolder(true).then(recIdle); };
 }
