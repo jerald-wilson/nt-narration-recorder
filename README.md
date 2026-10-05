@@ -64,12 +64,17 @@ one for a chapter (`MARK 4`). Rebuild with `node scripts/build-descriptions.js` 
 
 ## Thumbnails
 
-`branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/MSB/` (not committed);
-start with `--tr kjv` (or `blb`, `bbe`) for another translation's color and badge, into `thumbnails/KJV/`:
-`branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260, `--books` for
-a playlist cover per book (`book-MAT.png`; `--books MAT JHN` for some), or
-`--title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"` for an explainer. The design is
-`branding/thumbnail.html`: the chapter, its first section heading, and the book's Greek title behind.
+`branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/{MSB,KJV,BLB,BBE}/`
+(not committed), using one headless Chrome for the whole batch:
+
+- `branding/thumbnails.sh --everything`: every chapter and book cover in all four translations (about 2 minutes)
+- `branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260 chapters
+- `branding/thumbnails.sh --books` for a playlist cover per book (`book-MAT.png`; `--books MAT JHN` for some)
+- `branding/thumbnails.sh --title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"` for an explainer
+- add `--tr kjv` (or `blb`, `bbe`, `all`) for another translation's color and badge; the default is MSB
+
+The design is `branding/thumbnail.html`: the chapter, its first section heading, the translation badge, and
+the book's Greek title faint along the bottom.
 
 ## Password
 
