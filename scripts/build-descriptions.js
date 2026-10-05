@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Writes video-descriptions.txt: a title and description for every chapter video and every section
-// video in the New Testament. Uses the same wording as the app's "Export this chapter" buttons
-// (exportCsv / exportTxt in app.js); change both together.
+// Writes video-descriptions/MSB.txt, KJV.txt, …: a title and description for every chapter video and
+// every section video in the New Testament, one file per read translation. Uses the same wording as
+// the app (sectionDescription / chapterDescription / titles in app.js); change both together.
 // Run: node scripts/build-descriptions.js   (after node scripts/build-data.js)
 "use strict";
 const fs = require("fs");
@@ -23,25 +23,29 @@ const rangeStr = (s) => s.start[0] === s.end[0]
   ? `${s.start[0]}:${s.start[1]}–${s.end[1]}`
   : `${s.start[0]}:${s.start[1]}–${s.end[0]}:${s.end[1]}`;
 const secSeconds = (s) => (s.words / C.wordsPerMinute) * 60;
-const readLine = `Read from the ${C.names[C.readRow]}, shown with the ${joinNames(C.rows.filter((r) => r !== C.readRow).map((r) => C.names[r]))} for comparison.`;
 
 // Sections: from each heading to the verse before the next heading (never across books), as in app.js.
-function sectionsOf(b) {
+function sectionsOf(b, tr) {
   const list = [];
   let s = null;
   for (const c of chapterNums(b)) {
     for (const v of DB.books[b].chapters[c]) {
       if (v.heading || !s) { s = { heading: v.heading || bookName(b), start: [c, v.v], end: [c, v.v], words: 0 }; list.push(s); }
       s.end = [c, v.v];
-      s.words += countWords(v[C.readRow] || "");
+      s.words += countWords(v[tr] || "");
     }
   }
   return list;
 }
 
 const rule = "=".repeat(78);
+fs.mkdirSync(path.join(root, "video-descriptions"), { recursive: true });
+for (const tr of C.rows) {
+const tokens = { translation: C.names[tr], short: tr.toUpperCase() };
+const templates = (kind) => C.titles[tr]?.[kind] || C.titles[kind];
+const readLine = `Read from the ${C.names[tr]}, shown with the ${joinNames(C.rows.filter((r) => r !== tr).map((r) => C.names[r]))} for comparison.`;
 const out = [
-  "VIDEO TITLES AND DESCRIPTIONS — New Testament",
+  `VIDEO TITLES AND DESCRIPTIONS — New Testament, read from the ${C.names[tr]}`,
   "",
   "Every chapter video and every section video, in Bible order. Search with Cmd+F for a chapter,",
   'for example "MARK 4". Copy the Title and the lines under Description into YouTube.',
@@ -56,11 +60,11 @@ const out = [
 let nChapters = 0, nSections = 0;
 
 for (const b of DB.order) {
-  const sections = sectionsOf(b);
+  const sections = sectionsOf(b, tr);
   for (const c of chapterNums(b)) {
     const verses = DB.books[b].chapters[c];
-    const chTitle = title(C.titles.chapter, { book: bookName(b), chapter: c });
-    const chSecs = verses.reduce((n, v) => n + countWords(v[C.readRow] || ""), 0) / C.wordsPerMinute * 60;
+    const chTitle = title(templates("chapter"), { ...tokens, book: bookName(b), chapter: c });
+    const chSecs = verses.reduce((n, v) => n + countWords(v[tr] || ""), 0) / C.wordsPerMinute * 60;
     out.push(rule, `${bookName(b).toUpperCase()} ${c}`, rule, "");
 
     // Chapter video
@@ -87,7 +91,7 @@ for (const b of DB.order) {
       if (s.start[0] !== s.end[0]) out.push("Crosses a chapter break.");
       out.push(
         "",
-        `Title: ${title(C.titles.section, { heading: s.heading, ref, book: bookName(b), chapter: c })}`,
+        `Title: ${title(templates("section"), { ...tokens, heading: s.heading, ref, book: bookName(b), chapter: c })}`,
         "",
         "Description:",
         `${s.heading} — ${ref}`,
@@ -103,5 +107,7 @@ for (const b of DB.order) {
   }
 }
 
-fs.writeFileSync(path.join(root, "video-descriptions.txt"), out.join("\n"));
-console.log(`video-descriptions.txt: ${nChapters} chapter videos, ${nSections} section videos`);
+const file = `video-descriptions/${tr.toUpperCase()}.txt`;
+fs.writeFileSync(path.join(root, file), out.join("\n"));
+console.log(`${file}: ${nChapters} chapter videos, ${nSections} section videos`);
+}

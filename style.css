@@ -202,6 +202,7 @@ button.small { padding: 1px 8px; font-size: 12px; margin-left: 6px; }
 .seg button:first-child { border-radius: 6px 0 0 6px; }
 .seg button:last-child { border-radius: 0 6px 6px 0; border-left: 0; }
 .seg button small { color: inherit; opacity: .6; }
+#read-pick { width: 100%; font-weight: 600; }
 select { padding: 5px; border-radius: 6px; border: 1px solid #b9b5ad; background: #fff; }
 .pickers { display: flex; gap: 8px; margin: 8px 0; }
 .pickers select:first-child { flex: 1; }

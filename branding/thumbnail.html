@@ -6,22 +6,26 @@
 <!-- YouTube thumbnail, 1280 × 720. Rendered to PNGs by branding/thumbnails.sh.
      Chapter:   ?ref=MAT+5                      (hook = the chapter's first section heading; &hook= overrides)
      Book:      ?book=MAT                       (a playlist cover; hook = "All 28 chapters")
+     Any of them: &tr=kjv  (the read translation: background color and corner badge; default msb)
      Explainer: ?title=Missing+verses&kicker=Why+some+Bibles+skip+Acts+8:37   (&greek= sets the background)
      Open over http (python3 -m http.server), not from Finder: Chrome blocks file pages from reading the data. -->
 <link rel="stylesheet" href="../style.css">
 <style>
   @font-face { font-family: "Gentium Book Plus"; src: url(../fonts/gentium-book-plus-greek-400-normal.woff2) format("woff2"); unicode-range: U+0370-03FF; }
   html, body { margin: 0; background: none; }
-  .t { position: relative; width: 1280px; height: 720px; overflow: hidden; background: var(--accent); color: var(--bg); font-family: var(--sans); }
+  .t { position: relative; width: 1280px; height: 720px; overflow: hidden; background: var(--tbg, var(--accent)); color: var(--bg); font-family: var(--sans); }
   /* The book's Greek title, large and faint, bleeding off the bottom right. */
   .greek { position: absolute; right: -30px; bottom: -30px; text-align: right; white-space: nowrap;
            font: 400 210px/0.88 "Gentium Book Plus", serif; letter-spacing: .04em; color: rgba(245, 241, 232, .065); }
   .badge { position: absolute; left: 64px; top: 56px; width: 150px; height: 150px; border-radius: 50%;
-           box-shadow: 0 0 0 6px var(--accent), 0 0 0 8px rgba(245, 241, 232, .35); }
+           box-shadow: 0 0 0 6px var(--tbg, var(--accent)), 0 0 0 8px rgba(245, 241, 232, .35); }
   .body { position: absolute; left: 64px; top: 236px; right: 64px; }
   .ref { font: 600 180px/0.95 var(--serif); letter-spacing: -.01em; white-space: nowrap; }
   .hook { font: 600 76px/1.08 var(--sans); color: #F0E3D6; margin-top: 22px; max-width: 1100px; text-wrap: balance; }
   .rule { width: 120px; height: 4px; background: #C9A27E; margin-top: 34px; }
+  /* The read translation, large, top right (YouTube puts the video length bottom right). */
+  .tr { position: absolute; right: 64px; top: 68px; padding: 6px 26px 10px; border-radius: 14px;
+        background: var(--bg); color: var(--tbg); font: 600 84px/1 var(--sans); letter-spacing: .02em; }
 </style>
 </head>
 <body class="theme-vellum">
@@ -38,6 +42,8 @@ const GREEK = {
   "1JN": "ΙΩΑΝΝΟΥ Α", "2JN": "ΙΩΑΝΝΟΥ Β", "3JN": "ΙΩΑΝΝΟΥ Γ", JUD: "ΙΟΥΔΑ", REV: "ΑΠΟΚΑΛΥΨΙΣ ΙΩΑΝΝΟΥ",
 };
 const q = new URLSearchParams(location.search);
+const TR = (q.get("tr") || "msb").toLowerCase();
+document.documentElement.style.setProperty("--tbg", CONFIG.thumbColors[TR] || CONFIG.thumbColors.msb);
 if (!q.get("ref") && !q.get("title") && !q.get("book")) q.set("ref", "MAT 5"); // a sample when opened bare
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const t = document.getElementById("t");
@@ -47,7 +53,7 @@ function fitLine(el, max) { let s = parseFloat(getComputedStyle(el).fontSize); w
 
 function paint(title, hook, greek) {
   t.innerHTML = `<div class="greek">${greek.split(" ").map(esc).join("<br>")}</div>` +
-    `<img class="badge" src="profile-i-800.png" alt="">` +
+    `<img class="badge" src="profile-i-800.png" alt=""><div class="tr">${esc(TR.toUpperCase())}</div>` +
     `<div class="body"><div class="ref">${title}</div>${hook ? `<div class="hook">${esc(hook)}</div>` : ""}<div class="rule"></div></div>`;
   document.fonts.ready.then(() => { fitLine(t.querySelector(".ref"), 1152); document.body.dataset.ready = "1"; });
 }

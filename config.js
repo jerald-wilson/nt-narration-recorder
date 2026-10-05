@@ -57,14 +57,17 @@ const CONFIG = {
   // 0 = don't stop; press Enter.
   outroSeconds: 10,
 
-  // Metadata templates. {heading} {ref} {book} {chapter}
+  // Thumbnail background per read translation (cream text sits on these; keep them dark).
+  thumbColors: { msb: "#6E2419", kjv: "#1E2F4F", blb: "#24452D", bbe: "#7E5313" },
+
+  // Metadata templates. {heading} {ref} {book} {chapter} {translation} (full name) {short} (MSB, KJV, …)
   // YouTube titles are at most titleMax characters. Each title uses the first template in its list
-  // that fits, so a long section heading drops the translation names instead of being cut off.
+  // that fits, so a long section heading drops the channel name instead of being cut off.
+  // To give one translation its own wording, add e.g.  kjv: { chapter: ["…"] }  inside titles.
   titleMax: 100,
   titles: {
-    section: ["{heading} | {ref} | MSB with KJV, BLB & BBE", "{heading} | {ref}"],
-    chapter: ["{book} {chapter} | Full chapter reading | Majority Standard Bible compared with three translations",
-      "{book} {chapter} | Full chapter reading | MSB with KJV, BLB & BBE"],
+    section: ["{heading} | {ref} ({short}) | Side by Side Scripture", "{heading} | {ref} ({short})"],
+    chapter: ["{book} {chapter} ({short}) | Side by Side Scripture"],
   },
 
   // Attribution lines added to every description. All four are public domain.

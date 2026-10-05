@@ -82,6 +82,7 @@ gate(() => fetch("data/nt.json")
 
 function init() {
   $("#loading").remove();
+  C.readRow = C.rows.includes(store.get("read", "")) ? store.get("read", "") : C.readRow;
   buildSections();
   buildAliases();
   for (const b of DB.order) $("#book-pick").add(new Option(bookName(b), b));
@@ -110,6 +111,7 @@ function init() {
 
 // Sections: from each heading to the verse before the next heading (never across books).
 function buildSections() {
+  SECTIONS = {};
   for (const b of DB.order) {
     const list = [];
     let s = null;
@@ -184,10 +186,12 @@ function redLetterHTML(t, spans) {
   for (const [a, b] of spans) out += esc(t.slice(at, a)) + `<span class="jw">${esc(t.slice(a, b))}</span>`, at = b;
   return out + esc(t.slice(at));
 }
+const norm = (s) => s.replace(/\s+/g, " ").trim();
 function stageParts(v) {
   const main = C.readRow;
   const comps = C.rows.filter((r) => r !== main);
-  const same = comps.filter((r) => v.flags.includes("same-as-main:" + r));
+  // Worked out here, not by the build, because the read translation can change.
+  const same = comps.filter((r) => v[r] && v[main] && norm(v[r]) === norm(v[main]));
   const shown = comps.filter((r) => !same.includes(r));
   const sameHTML = same.length
     ? `<section class="row same"><div class="label">Same in ${esc(joinNames(same.map((r) => C.names[r])))}</div></section>` : "";
@@ -439,11 +443,13 @@ function showFolder() {
   const ch = $("#rec-folder-change");
   if (ch) ch.onclick = () => { if (!rec.recorder) chooseFolder(true).then(recIdle); };
 }
-async function exists(name) {
-  try { await rec.dir.getFileHandle(name); return true; } catch { return false; }
+// Each translation's takes go in their own subfolder (MSB, KJV, …) so readings never mix.
+const takeDir = (t) => rec.dir.getDirectoryHandle(t.tr.toUpperCase(), { create: true });
+async function exists(dir, name) {
+  try { await dir.getFileHandle(name); return true; } catch { return false; }
 }
-async function writeFile(name, data) {
-  const fh = await rec.dir.getFileHandle(name, { create: true });
+async function writeFile(dir, name, data) {
+  const fh = await dir.getFileHandle(name, { create: true });
   const w = await fh.createWritable();
   await w.write(data);
   await w.close();
@@ -458,13 +464,14 @@ async function saveTake(t) {
   drawTakes();
   try {
     if (!rec.dir || await rec.dir.queryPermission({ mode: "readwrite" }) !== "granted") throw new Error("no folder to save into");
+    const dir = await takeDir(t);
     if (!t.name) { // first free take number for this chapter, so earlier sessions are never overwritten
       let n = 1;
-      while (await exists(`${t.base}-take${n}.${t.ext}`)) n++;
+      while (await exists(dir, `${t.base}-take${n}.${t.ext}`)) n++;
       t.name = `${t.base}-take${n}.${t.ext}`;
     }
-    await writeFile(t.name, t.blob);
-    await writeFile(t.name.replace(/\.\w+$/, ".txt"), t.text);
+    await writeFile(dir, t.name, t.blob);
+    await writeFile(dir, t.name.replace(/\.\w+$/, ".txt"), t.text);
     t.status = "saved";
     t.blob = null; // safely on disk
   } catch (e) {
@@ -477,7 +484,7 @@ async function saveTake(t) {
 function drawTakes() {
   const el = $("#rec-takes");
   el.innerHTML = rec.list.slice().reverse().map((t) => {
-    const name = esc(t.name || `${t.base}-take?.${t.ext}`);
+    const name = esc(`${t.tr.toUpperCase()}/` + (t.name || `${t.base}-take?.${t.ext}`));
     const info = `${fmtTime(t.secs)} · ${(t.size / 1e6).toFixed(0)} MB`;
     const state = t.status === "saved" ? `<span class="ok">✓ Saved</span>`
       : t.status === "saving" ? `Saving…`
@@ -496,8 +503,9 @@ async function discardSaved(t) {
   }
   if (t.status === "saved") {
     try {
-      await rec.dir.removeEntry(t.name);
-      await rec.dir.removeEntry(t.name.replace(/\.\w+$/, ".txt")).catch(() => {});
+      const dir = await takeDir(t);
+      await dir.removeEntry(t.name);
+      await dir.removeEntry(t.name.replace(/\.\w+$/, ".txt")).catch(() => {});
     } catch (e) { t.confirm = 0; t.status = "saved"; recStatus(`Couldn't delete ${esc(t.name)}: ${esc(e.message)}`, true); drawTakes(); return false; }
   }
   rec.list.splice(rec.list.indexOf(t), 1);
@@ -613,7 +621,8 @@ async function startTake() {
   const v = verse();
   const started = Date.now();
   // Named when saved (the take number is the first one free in the folder).
-  const base = `${state.book}-${state.ch}-${v.v}-${state.format}`, ext = type.startsWith("video/mp4") ? "mp4" : "webm";
+  const tr = C.readRow;
+  const base = `${state.book}-${state.ch}-${v.v}-${state.format}-${tr}`, ext = type.startsWith("video/mp4") ? "mp4" : "webm";
   const chunks = rec.chunks = [];
   r.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
   const format = state.format;
@@ -622,7 +631,7 @@ async function startTake() {
     if (r.discarded) return;
     const blob = new Blob(chunks, { type: r.mimeType });
     const secs = (Date.now() - started) / 1000;
-    const t = { id: started, base, ext, blob, size: blob.size, secs, text: takeDescription(format, marks, secs), status: "saving" };
+    const t = { id: started, tr, base, ext, blob, size: blob.size, secs, text: takeDescription(format, marks, secs), status: "saving" };
     rec.list.push(t);
     saveTake(t);
   };
@@ -631,7 +640,7 @@ async function startTake() {
   rec.started = started;
   markVerse();
   document.body.classList.add("recording");
-  $("#mic-pick").disabled = true;
+  $("#mic-pick").disabled = $("#read-pick").disabled = true;
   $("#btn-rec").textContent = "Stop take (Enter)";
   const { width, height } = track.getSettings();
   const size = width && height ? ` · ${width} × ${height}` : "";
@@ -653,7 +662,7 @@ function stopTake() {
   if (rec.recorder.state !== "inactive") rec.recorder.stop();
   rec.recorder = null;
   document.body.classList.remove("recording");
-  $("#mic-pick").disabled = false;
+  $("#mic-pick").disabled = $("#read-pick").disabled = false;
   recIdle();
 }
 
@@ -723,6 +732,7 @@ window.addEventListener("beforeunload", (e) => { if (rec.recorder || rec.list.so
 // ---------- panel ----------
 function renderPanel(v) {
   document.querySelectorAll("#format-seg button").forEach((b) => b.classList.toggle("on", b.dataset.format === state.format));
+  $("#read-pick").value = C.readRow;
   $("#book-pick").value = state.book;
   const cp = $("#chapter-pick");
   if (cp.dataset.book !== state.book) {
@@ -875,13 +885,16 @@ const fill = (t, o) => t.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? "");
 const title = (list, o) => list.map((t) => fill(t, o)).find((t) => t.length <= C.titleMax) ?? fill(list.at(-1), o);
 const csvCell = (s) => `"${String(s).replace(/"/g, '""')}"`;
 const fullRef = (b, s) => `${bookName(b)} ${rangeStr(s)}`;
-const chapterTitle = (b, c) => title(C.titles.chapter, { book: bookName(b), chapter: c });
+// Title templates for the read translation (its own wording if config.js gives one).
+const titleTokens = () => ({ translation: C.names[C.readRow], short: C.readRow.toUpperCase() });
+const templates = (kind) => C.titles[C.readRow]?.[kind] || C.titles[kind];
+const chapterTitle = (b, c) => title(templates("chapter"), { ...titleTokens(), book: bookName(b), chapter: c });
 // Every section belongs to the chapter it starts in.
 const sectionsStartingIn = (b, c) => SECTIONS[b].filter((s) => s.start[0] === +c);
 const sectionsTouching = (b, c) => SECTIONS[b].filter((s) => s.start[0] <= c && s.end[0] >= c);
 
 const readLine = () => `Read from the ${C.names[C.readRow]}, shown with the ${joinNames(C.rows.filter((r) => r !== C.readRow).map((r) => C.names[r]))} for comparison.`;
-const sectionTitle = (b, s) => title(C.titles.section, { heading: s.heading, ref: fullRef(b, s), book: bookName(b), chapter: s.start[0] });
+const sectionTitle = (b, s) => title(templates("section"), { ...titleTokens(), heading: s.heading, ref: fullRef(b, s), book: bookName(b), chapter: s.start[0] });
 function sectionDescription(b, s, isShort) {
   const c = s.start[0];
   return [
@@ -974,6 +987,16 @@ function wireControls() {
   $("#btn-prev").onclick = () => step(-1);
   $("#btn-reset").onclick = reset;
   $("#debug").onchange = (e) => { state.debug = e.target.checked; render(); };
+  for (const r of C.rows) $("#read-pick").add(new Option(`Reading: ${C.names[r]}`, r));
+  // The read translation: the main row, time estimates, search, titles, and where takes are saved.
+  $("#read-pick").onchange = (e) => {
+    e.target.blur();
+    if (rec.recorder) { e.target.value = C.readRow; return; } // locked during a take
+    C.readRow = e.target.value;
+    store.set("read", C.readRow);
+    buildSections();
+    render();
+  };
   $("#btn-rec").onclick = toggleTake;
   $("#rec-takes").onclick = (e) => {
     const s = e.target.dataset.save, d = e.target.dataset.discard;

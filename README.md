@@ -49,14 +49,19 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 **Exports** (under Exports and layout tools in the panel): `sections-BOOK-CH.csv` (titles, descriptions, lengths for each section
 video) and `sections-BOOK-CH.txt` (the chapter's section list, ready for YouTube chapter times).
 
-**All descriptions at once:** [`video-descriptions.txt`](video-descriptions.txt) has the title and
-description for every chapter video and every section video in the New Testament. Search it for a
-chapter (`MARK 4`). Rebuild it with `node scripts/build-descriptions.js` after changing `config.js` or
-the data.
+**Reading other translations:** the **Reading** menu picks the translation you read (MSB, KJV, BLB,
+BBE). It becomes the main row; titles, descriptions and time estimates follow it, and takes are saved
+in a subfolder per translation (`KJV/MAT-5-1-full-kjv-take1.mp4`).
+
+**All descriptions at once:** [`video-descriptions/`](video-descriptions) has a file per read translation
+(`MSB.txt`, `KJV.txt`, …) with the title and description for every chapter and section video. Search
+one for a chapter (`MARK 4`). Rebuild with `node scripts/build-descriptions.js` after changing
+`config.js` or the data.
 
 ## Thumbnails
 
-`branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/` (not committed):
+`branding/thumbnails.sh` renders 1280 × 720 YouTube thumbnails into `thumbnails/MSB/` (not committed);
+start with `--tr kjv` (or `blb`, `bbe`) for another translation's color and badge, into `thumbnails/KJV/`:
 `branding/thumbnails.sh "MAT 5"` for a chapter, `MAT` for a book, nothing for all 260, `--books` for
 a playlist cover per book (`book-MAT.png`; `--books MAT JHN` for some), or
 `--title "Missing verses" --kicker "Why some Bibles skip Acts 8:37"` for an explainer. The design is
