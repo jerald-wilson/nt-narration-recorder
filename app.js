@@ -503,7 +503,7 @@ async function chooseFolder(fresh) {
 }
 function showFolder() {
   $("#rec-folder").innerHTML = rec.dir
-    ? `Saving to the <b>${esc(rec.dir.name)}</b> folder · <a id="rec-folder-change">Change</a>`
+    ? `Saving to <b>${esc(rec.dir.name)} / ${C.readRow.toUpperCase()}</b> (follows the Reading menu) · <a id="rec-folder-change">Change</a>`
     : `No recordings folder chosen yet.`;
   const ch = $("#rec-folder-change");
   if (ch) ch.onclick = () => { if (!rec.recorder) chooseFolder(true).then(recIdle); };
@@ -1061,6 +1061,7 @@ function wireControls() {
     store.set("read", C.readRow);
     buildSections();
     render();
+    showFolder();
   };
   $("#btn-rec").onclick = toggleTake;
   $("#rec-takes").onclick = (e) => {
