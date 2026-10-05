@@ -28,13 +28,11 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 4. Press **R** for the chapter's intro slide, then **Enter** to start a take. Read, pressing Space for
    each verse. Space after the last verse shows the outro slide, which leaves room for YouTube's end
    screen; the take stops itself 10 seconds later, or press **Enter** to stop sooner.
-5. Each take is written, with a `.txt` of its title and description, and checked. Recording never
-   waits on a folder: takes go into your recordings folder when Chrome allows it, otherwise into the
-   app's own storage in this browser (they survive reloads). **Choose a folder** once in the panel;
-   on a later visit Chrome may want one click to allow it again (pick **Allow on every visit**), and
-   **Move to the folder** copies any takes waiting in the app. The translation subfolder (`MSB/`,
-   `KJV/`, …) always follows the **Reading** menu by itself. Take numbers start at the first free
-   one, so nothing is overwritten. **Discard** (click twice) deletes a take.
+5. Each take downloads to your Downloads folder as one video file (`MAT-5-1-full-kjv-take1.mp4`).
+   Its title and description are a **Copy description** button in the take list. A backup of every
+   take stays in the app (this browser, survives reloads) until you **Discard** it (click twice), so
+   **Download again** works if a download didn't arrive. If Chrome ever blocks downloads, allow them
+   for the site at `chrome://settings/content/automaticDownloads`.
 6. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over,
    press **Backspace twice**: during a take it's thrown away unsaved; between takes it deletes the
    one just finished. Either way you're back at the intro.
@@ -53,7 +51,7 @@ video) and `sections-BOOK-CH.txt` (the chapter's section list, ready for YouTube
 
 **Reading other translations:** the **Reading** menu picks the translation you read (MSB, KJV, BLB,
 BBE). It becomes the main row; titles, descriptions and time estimates follow it, and takes are saved
-in a subfolder per translation (`KJV/MAT-5-1-full-kjv-take1.mp4`).
+with the translation in their name (`MAT-5-1-full-kjv-take1.mp4`).
 
 **Focal point:** around the verse being read, the last lines of the previous verse and the first lines
 of the next show faded, in space the verse doesn't need (it is never shrunk to make room), and Space
