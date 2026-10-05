@@ -95,6 +95,16 @@ body {
   margin-top: .8em;
 }
 
+/* Focal point: faded edges of the previous and next verse around the one being read.
+   Hidden while the verse is sized; addFocus() sets their height in whole lines. */
+.stage .focus { overflow: hidden; position: relative; }
+.stage .focus .ghost { position: absolute; left: 0; right: 0; pointer-events: none; }
+.stage .ctx { display: none; overflow: hidden; }
+.stage .ctx.on { display: flex; flex-direction: column; }
+.stage .ctx.prev { justify-content: flex-end; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 75%); mask-image: linear-gradient(to bottom, transparent, #000 75%); }
+.stage .ctx.next { justify-content: flex-start; -webkit-mask-image: linear-gradient(to top, transparent, #000 75%); mask-image: linear-gradient(to top, transparent, #000 75%); }
+.stage .ctx .text { flex: none; }
+
 /* Section (portrait) */
 .stage .head { margin-bottom: 8px; }
 .stage .head .book {

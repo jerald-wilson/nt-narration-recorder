@@ -53,6 +53,10 @@ video) and `sections-BOOK-CH.txt` (the chapter's section list, ready for YouTube
 BBE). It becomes the main row; titles, descriptions and time estimates follow it, and takes are saved
 in a subfolder per translation (`KJV/MAT-5-1-full-kjv-take1.mp4`).
 
+**Focal point:** around the verse being read, the last lines of the previous verse and the first lines
+of the next show faded, in space the verse doesn't need (it is never shrunk to make room), and Space
+scrolls them up smoothly. Tune `focus` in `config.js` (lines, opacity, scroll time).
+
 **All descriptions at once:** [`video-descriptions/`](video-descriptions) has a file per read translation
 (`MSB.txt`, `KJV.txt`, …) with the title and description for every chapter and section video. Search
 one for a chapter (`MARK 4`). Rebuild with `node scripts/build-descriptions.js` after changing
@@ -90,7 +94,7 @@ Standard Bible downloads don't include headings). To rename, add, or remove one,
 ```sh
 scripts/fetch-sources.sh      # downloads raw sources into data/raw/
 node scripts/build-data.js    # writes data/nt.json and prints the report
-node scripts/build-descriptions.js  # writes video-descriptions.txt
+node scripts/build-descriptions.js  # writes video-descriptions/MSB.txt, KJV.txt, …
 ```
 
 The report (also saved to `data/build-report.txt`) lists flagged verses, the longest verses, section

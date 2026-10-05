@@ -176,8 +176,32 @@ function labelHTML(r) {
 }
 function rowHTML(r, v, cls) {
   const t = v[r];
-  return `<section class="row ${cls}"><div class="label">${labelHTML(r)}</div>` +
-    (t ? `<p class="text">${redLetterHTML(t, C.redLetter.includes(r) && v.red?.[r])}</p>` : `<p class="text absent">Not in this translation</p>`) + `</section>`;
+  const text = t ? `<p class="text">${redLetterHTML(t, C.redLetter.includes(r) && v.red?.[r])}</p>` : `<p class="text absent">Not in this translation</p>`;
+  // The read row gets slots for the faded neighbouring verses (filled after fitting; see addFocus).
+  const body = cls === "main" ? `<div class="focus"><div class="focus-in"><div class="ctx prev"></div>${text.replace('class="text', 'class="text cur')}<div class="ctx next"></div></div></div>` : text;
+  return `<section class="row ${cls}"><div class="label">${labelHTML(r)}</div>${body}</section>`;
+}
+// Focal point: after the verse is sized, spare height under it holds up to C.focus.contextLines faded
+// lines of the previous verse (above) and of the next (below). Never shrinks the verse being read.
+function addFocus(el, b, c, v, room) {
+  const list = DB.books[b].chapters[c], i = list.indexOf(v), main = C.readRow;
+  const cur = el.querySelector(".text.cur");
+  if (!cur || i < 0) return;
+  const lh = parseFloat(getComputedStyle(cur).lineHeight);
+  const prev = list[i - 1], next = list[i + 1];
+  const fill = (slot, w, lines) => {
+    if (!lines || !w?.[main]) return;
+    slot.innerHTML = `<p class="text">${redLetterHTML(w[main], C.redLetter.includes(main) && w.red?.[main])}</p>`;
+    slot.style.height = lines * lh + "px";
+    slot.style.opacity = C.focus.opacity;
+    slot.classList.add("on");
+  };
+  let n = Math.floor(room / lh);
+  const max = C.focus.contextLines;
+  const above = prev?.[main] ? Math.min(max, next?.[main] ? Math.floor(n / 2) : n) : 0;
+  const below = next?.[main] ? Math.min(max, n - above) : 0;
+  fill(el.querySelector(".ctx.prev"), prev, above);
+  fill(el.querySelector(".ctx.next"), next, below);
 }
 // Words of Jesus (character ranges from the data) wrapped in red.
 function redLetterHTML(t, spans) {
@@ -249,6 +273,7 @@ function paintStage(el, fmt, b, c, v) {
     const area = el.querySelector(".area"), content = el.querySelector(".content");
     const r = fit(SECTION_STEPS, (s) => setSizes(content, s), () => content.offsetHeight <= area.clientHeight);
     area.classList.toggle("center", r.idx === 0 && content.offsetHeight < area.clientHeight * 0.6);
+    addFocus(el, b, c, v, area.clientHeight - content.offsetHeight);
     return { main: r.step[0], comp: r.step[1], label: r.step[2], fits: r.fits };
   }
   const last = DB.books[b].chapters[c].at(-1).v;
@@ -263,7 +288,44 @@ function paintStage(el, fmt, b, c, v) {
   const lc = left.querySelector(".content"), rc = right.querySelector(".content");
   const a = fit(FULL_MAIN_STEPS, (s) => setSizes(lc, s), () => lc.offsetHeight <= left.clientHeight);
   const z = fit(FULL_COMP_STEPS, (s) => setSizes(rc, s), () => rc.offsetHeight <= right.clientHeight);
+  addFocus(el, b, c, v, left.clientHeight - lc.offsetHeight);
   return { main: a.step[0], comp: z.step[1], label: z.step[2], fits: a.fits && z.fits };
+}
+
+// Where the read panel was before a re-render, so a step to the next verse can scroll smoothly:
+// the faded "next" lines slide up into place as the verse being read.
+let painted = null; // the verse the stage shows now: { key, i }
+function focusSnapshot() {
+  const next = stage.querySelector(".ctx.next.on"), cur = stage.querySelector(".text.cur");
+  if (!cur || !painted) return null;
+  const top = stage.getBoundingClientRect().top, inner = stage.querySelector(".focus-in");
+  // A copy of the old panel, minus its faded "next" lines (they become the new verse), to slide out.
+  const ghost = inner.cloneNode(true);
+  ghost.querySelector(".ctx.next")?.remove();
+  return { ...painted, nextTop: (next || cur).getBoundingClientRect().top - top, hadNext: !!next,
+    ghost, ghostTop: inner.getBoundingClientRect().top - top };
+}
+function scrollFocus(before) {
+  if (!before || before.key !== `${state.format}|${state.book}|${state.ch}` || state.i !== before.i + 1) return;
+  const inner = stage.querySelector(".focus-in"), cur = stage.querySelector(".text.cur"), prev = stage.querySelector(".ctx.prev.on");
+  if (!inner || !cur) return;
+  const ms = C.focus.scrollMs, ease = "cubic-bezier(.2,.7,.2,1)", o = C.focus.opacity;
+  const top = stage.getBoundingClientRect().top;
+  const delta = before.hadNext ? before.nextTop - (cur.getBoundingClientRect().top - top) : 0;
+  const opt = { duration: ms, easing: ease };
+  cur.animate([{ opacity: before.hadNext ? o : 0 }, { opacity: 1 }], opt);
+  if (delta <= 0) return;
+  // New panel rises from where its verse was showing as faded "next" lines; the old one rises with it
+  // and dims, ending exactly on the new faded "previous" lines, which then take over.
+  inner.animate([{ transform: `translateY(${delta}px)` }, { transform: "none" }], opt);
+  if (prev) prev.animate([{ opacity: 0 }, { opacity: 0 }], opt);
+  const g = before.ghost, focus = inner.parentElement;
+  g.classList.add("ghost");
+  g.style.top = before.ghostTop - (focus.getBoundingClientRect().top - top) + "px";
+  focus.appendChild(g);
+  g.querySelector(".ctx.prev")?.animate([{ opacity: o }, { opacity: 0 }], opt);
+  g.querySelector(".text.cur")?.animate([{ opacity: 1 }, { opacity: o }], opt);
+  g.animate([{ transform: "none" }, { transform: `translateY(${-delta}px)` }], opt).onfinish = () => g.remove();
 }
 
 // Next chapter (or book) after b c, or null at the end of the New Testament.
@@ -341,6 +403,7 @@ function render() {
   $("#debug").checked = state.debug;
 
   if (state.slide && !slideOn(state.slide)) state.slide = null;
+  const before = focusSnapshot();
   const info = state.slide
     ? (paintSlide(stage, state.format, state.slide, state.book, state.ch, v), { main: "–", comp: "–", label: "–", fits: true })
     : paintStage(stage, state.format, state.book, state.ch, v);
@@ -348,6 +411,8 @@ function render() {
     (info.fits ? "" : ` <b class="warn">— does not fit; report this verse</b>`);
   $("#fit-info").className = "hint" + (info.fits ? "" : " warn");
 
+  if (!state.slide) scrollFocus(before);
+  painted = state.slide ? null : { key: `${state.format}|${state.book}|${state.ch}`, i: state.i };
   renderPanel(v);
   checkCapture();
   markVerse();

@@ -57,6 +57,10 @@ const CONFIG = {
   // 0 = don't stop; press Enter.
   outroSeconds: 10,
 
+  // Focal-point read panel: faded lines of the previous and next verse around the one being read,
+  // only in space the verse doesn't need. Opacity of those lines, and how long the scroll takes.
+  focus: { contextLines: 2, opacity: 0.38, scrollMs: 350 },
+
   // Thumbnail background per read translation (cream text sits on these; keep them dark).
   thumbColors: { msb: "#6E2419", kjv: "#1E2F4F", blb: "#24452D", bbe: "#7E5313" },
 
