@@ -22,17 +22,19 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 
 1. Pick **Section** or **Full video**.
 2. Press `/`, type a reference (`mark 4:1`, `2co 6`, `jn 3`) and press Enter.
-3. Press **Enter** to choose the folder takes are saved in (once; Chrome remembers it, and may ask
-   to allow it again on a later visit). Press **Enter** again to connect the recorder: Chrome asks to
-   share this tab and to use the microphone; allow both. Pick your mic and check its level meter.
-   Turn on Do Not Disturb first: the recorder takes no computer audio, but the mic hears the speakers.
+3. Press **Enter** to connect the recorder: Chrome asks to share this tab and to use the microphone;
+   allow both. Pick your mic and check its level meter. Turn on Do Not Disturb first: the recorder
+   takes no computer audio, but the mic hears the speakers.
 4. Press **R** for the chapter's intro slide, then **Enter** to start a take. Read, pressing Space for
    each verse. Space after the last verse shows the outro slide, which leaves room for YouTube's end
    screen; the take stops itself 10 seconds later, or press **Enter** to stop sooner.
-5. Each take is written into the folder with a `.txt` of its title and description
-   (`MAT-5-1-full-take1.mp4`; the take number is the first one free in the folder, so nothing is
-   overwritten). The panel lists the session's takes: **✓ Saved** only once the files are checked on
-   disk; a failed save stays in memory with **Save again**. **Discard** (click twice) deletes a take.
+5. Each take is written, with a `.txt` of its title and description, and checked. Recording never
+   waits on a folder: takes go into your recordings folder when Chrome allows it, otherwise into the
+   app's own storage in this browser (they survive reloads). **Choose a folder** once in the panel;
+   on a later visit Chrome may want one click to allow it again (pick **Allow on every visit**), and
+   **Move to the folder** copies any takes waiting in the app. The translation subfolder (`MSB/`,
+   `KJV/`, …) always follows the **Reading** menu by itself. Take numbers start at the first free
+   one, so nothing is overwritten. **Discard** (click twice) deletes a take.
 6. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over,
    press **Backspace twice**: during a take it's thrown away unsaved; between takes it deletes the
    one just finished. Either way you're back at the intro.

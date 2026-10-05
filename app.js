@@ -446,9 +446,9 @@ window.addEventListener("resize", () => { if (DB) checkCapture(); });
 // ---------- built-in recorder (Chrome): the stage only, plus the microphone ----------
 // Enter connects once per session (Chrome asks to share this tab, and for the mic), then starts
 // and stops takes. Chrome's Region Capture crops the tab to #stage, so no selection box.
-// Each take is written, with its description, into a folder you pick once (see "recordings folder").
+// Each take is written, with its description, and checked (see "where takes are saved").
 const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, ctx: null, meter: 0, outroAt: 0, discardArmed: 0,
-  dir: null, list: [] };
+  dir: null, app: null, list: [] };
 const REC_TYPES = ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm"];
 
 function recStatus(html, warn) {
@@ -458,22 +458,19 @@ function recStatus(html, warn) {
 }
 function recIdle() {
   const on = !!rec.video;
-  $("#btn-rec").textContent = on ? "Start take (Enter)" : rec.dir ? "Connect recorder (Enter)"
-    : rec.remembered ? `Allow saving to ${rec.remembered} (Enter)` : "Choose recordings folder (Enter)";
-  if (!rec.dir && !on) {
-    recStatus(rec.remembered
-      ? `Chrome asks again on each visit before the app may save to <b>${esc(rec.remembered)}</b>. Press <b>Enter</b>, then choose <b>Allow on every visit</b> so it stops asking.`
-      : `Press <b>Enter</b> to choose the folder your takes are saved in.`);
-    return;
-  }
+  $("#btn-rec").textContent = on ? "Start take (Enter)" : "Connect recorder (Enter)";
   // The mic hears the iMac's speakers, so alert sounds end up in the take unless macOS is silenced.
   recStatus(on ? `Connected. Press <b>Enter</b> to start a take.<br><small>Turn on Do Not Disturb (Control Center, top right) so alerts don't sound while you read.</small>` : `Press <b>Enter</b> to connect the recorder.`);
 }
 
-// ---------- recordings folder ----------
-// Takes are written straight into a folder you pick (Chrome's File System Access), not downloaded:
-// downloads can be blocked silently, and a page can't check or delete them. Chrome remembers the
-// folder (kept in IndexedDB) and may ask again to allow it on a later visit.
+// ---------- where takes are saved ----------
+// Never through downloads: those can be blocked silently, and a page can't check or delete them.
+// Recording never waits on a folder. Each take is written, and checked, into:
+//   - your recordings folder, when Chrome allows it (it asks again on a later visit, one click,
+//     unless you chose "Allow on every visit"); otherwise
+//   - the app's own storage in this browser (no permission needed; survives reloads). One click
+//     on "Move to folder" copies those takes into your folder and removes them from the app.
+// Each translation's takes go in their own subfolder (MSB, KJV, …) so readings never mix.
 function kv(mode, fn) {
   return new Promise((resolve, reject) => {
     const open = indexedDB.open("ntr", 1);
@@ -486,38 +483,10 @@ function kv(mode, fn) {
     };
   });
 }
-// The folder from last time, if Chrome still allows writing to it without asking.
-async function restoreFolder() {
-  try {
-    const dir = await kv("readonly", (st) => st.get("folder"));
-    if (dir && await dir.queryPermission({ mode: "readwrite" }) === "granted") rec.dir = dir;
-    else if (dir) rec.remembered = dir.name; // known, but Chrome wants a click to allow it again
-  } catch { /* no saved folder */ }
-  showFolder();
-}
-// Needs a click or key press: may show Chrome's folder picker or its "allow" prompt.
-async function chooseFolder(fresh) {
-  if (!window.showDirectoryPicker) { recStatus("Saving takes to a folder needs Google Chrome.", true); return false; }
-  try {
-    let dir = fresh ? null : await kv("readonly", (st) => st.get("folder")).catch(() => null);
-    if (dir && await dir.requestPermission({ mode: "readwrite" }) !== "granted") dir = null;
-    if (!dir) dir = await window.showDirectoryPicker({ id: "recordings", mode: "readwrite", startIn: "downloads" });
-    await kv("readwrite", (st) => st.put(dir, "folder"));
-    rec.dir = dir;
-    rec.remembered = "";
-    showFolder();
-    return true;
-  } catch { recStatus("No folder chosen. Press <b>Enter</b> to pick one.", true); return false; }
-}
-function showFolder() {
-  $("#rec-folder").innerHTML = rec.dir
-    ? `Saving to <b>${esc(rec.dir.name)} / ${C.readRow.toUpperCase()}</b> (follows the Reading menu) · <a id="rec-folder-change">Change</a>`
-    : rec.remembered ? `Recordings folder: <b>${esc(rec.remembered)}</b> (waiting for Chrome's permission)` : `No recordings folder chosen yet.`;
-  const ch = $("#rec-folder-change");
-  if (ch) ch.onclick = () => { if (!rec.recorder) chooseFolder(true).then(recIdle); };
-}
-// Each translation's takes go in their own subfolder (MSB, KJV, …) so readings never mix.
-const takeDir = (t) => rec.dir.getDirectoryHandle(t.tr.toUpperCase(), { create: true });
+const folderReady = async () => !!rec.dir && await rec.dir.queryPermission({ mode: "readwrite" }).catch(() => "denied") === "granted";
+const rootOf = (where) => where === "folder" ? rec.dir : rec.app;
+const subdir = (root, tr) => root.getDirectoryHandle(tr.toUpperCase(), { create: true });
+const txtOf = (name) => name.replace(/\.\w+$/, ".txt");
 async function exists(dir, name) {
   try { await dir.getFileHandle(name); return true; } catch { return false; }
 }
@@ -529,37 +498,107 @@ async function writeFile(dir, name, data) {
   const size = data instanceof Blob ? data.size : new Blob([data]).size;
   if ((await fh.getFile()).size !== size) throw new Error("the file on disk is the wrong size");
 }
+// First free take number for this chapter, so nothing is ever overwritten.
+async function freeName(dir, base, ext) {
+  let n = 1;
+  while (await exists(dir, `${base}-take${n}.${ext}`)) n++;
+  return `${base}-take${n}.${ext}`;
+}
 
-// Saves a finished take and its description, checking both are really on disk. Until then the
+// At start-up: the app's storage, the remembered folder (if Chrome still allows it), and any
+// takes still waiting in the app from earlier sessions.
+async function restoreStorage() {
+  try { rec.app = await navigator.storage.getDirectory(); navigator.storage.persist?.(); } catch { rec.app = null; }
+  try {
+    const dir = await kv("readonly", (st) => st.get("folder"));
+    if (dir) rec.dir = dir;
+  } catch { /* none remembered */ }
+  if (rec.app) {
+    for await (const [tr, sub] of rec.app.entries()) {
+      if (sub.kind !== "directory") continue;
+      for await (const [name, fh] of sub.entries()) {
+        if (!/\.(mp4|webm)$/.test(name)) continue;
+        const f = await fh.getFile();
+        rec.list.push({ id: `app/${tr}/${name}`, tr: tr.toLowerCase(), name, ext: name.split(".").pop(), size: f.size, status: "saved", where: "app" });
+      }
+    }
+  }
+  showFolder();
+  drawTakes();
+}
+// Needs a click: may show Chrome's folder picker or its one-click "allow" prompt.
+async function chooseFolder(fresh) {
+  if (!window.showDirectoryPicker) { recStatus("Saving to a folder needs Google Chrome.", true); return false; }
+  try {
+    let dir = fresh ? null : rec.dir;
+    if (dir && await dir.requestPermission({ mode: "readwrite" }) !== "granted") dir = null;
+    if (!dir) dir = await window.showDirectoryPicker({ id: "recordings", mode: "readwrite", startIn: "downloads" });
+    await kv("readwrite", (st) => st.put(dir, "folder"));
+    rec.dir = dir;
+    showFolder();
+    return true;
+  } catch { showFolder(); return false; }
+}
+async function showFolder() {
+  const el = $("#rec-folder"), waiting = rec.list.filter((t) => t.where === "app").length;
+  const ready = await folderReady();
+  const tr = C.readRow.toUpperCase();
+  if (ready) el.innerHTML = `Saving to <b>${esc(rec.dir.name)} / ${tr}</b> (follows the Reading menu) · <a data-act="change">Change</a>` +
+    (waiting ? `<br><button class="small" data-act="move">Move ${waiting} take${waiting > 1 ? "s" : ""} from the app to the folder</button>` : "");
+  else el.innerHTML = `Takes are saved in the app (${tr}). ` + (rec.dir
+    ? `<button class="small" data-act="allow">Save to ${esc(rec.dir.name)} instead</button>`
+    : `<button class="small" data-act="choose">Choose a folder</button>`) +
+    (waiting ? `<br>${waiting} take${waiting > 1 ? "s" : ""} waiting in the app; they move to the folder once it's allowed.` : "");
+}
+// Copies takes kept in the app into the folder (checked), then removes them from the app.
+async function moveToFolder() {
+  if (!await folderReady()) return;
+  for (const t of rec.list.filter((x) => x.where === "app" && x.status === "saved")) {
+    try {
+      const from = await subdir(rec.app, t.tr), to = await subdir(rec.dir, t.tr);
+      const video = await (await from.getFileHandle(t.name)).getFile();
+      const text = await exists(from, txtOf(t.name)) ? await (await from.getFileHandle(txtOf(t.name))).getFile() : null;
+      const base = t.name.replace(/-take\d+\.\w+$/, "");
+      const name = await freeName(to, base, t.ext);
+      await writeFile(to, name, video);
+      if (text) await writeFile(to, txtOf(name), text);
+      await from.removeEntry(t.name);
+      if (text) await from.removeEntry(txtOf(t.name));
+      Object.assign(t, { name, where: "folder" });
+    } catch (e) { recStatus(`Couldn't move ${esc(t.name)}: ${esc(e.message)}. It's still safe in the app.`, true); }
+  }
+  showFolder();
+  drawTakes();
+}
+
+// Saves a finished take and its description, checking both are really written. Until then the
 // take stays in memory, listed with "Save again".
 async function saveTake(t) {
   t.status = "saving";
   drawTakes();
   try {
-    if (!rec.dir || await rec.dir.queryPermission({ mode: "readwrite" }) !== "granted") throw new Error("no folder to save into");
-    const dir = await takeDir(t);
-    if (!t.name) { // first free take number for this chapter, so earlier sessions are never overwritten
-      let n = 1;
-      while (await exists(dir, `${t.base}-take${n}.${t.ext}`)) n++;
-      t.name = `${t.base}-take${n}.${t.ext}`;
-    }
+    t.where = await folderReady() ? "folder" : "app";
+    if (!rootOf(t.where)) throw new Error("this browser has no storage the app can use");
+    const dir = await subdir(rootOf(t.where), t.tr);
+    if (!t.name) t.name = await freeName(dir, t.base, t.ext);
     await writeFile(dir, t.name, t.blob);
-    await writeFile(dir, t.name.replace(/\.\w+$/, ".txt"), t.text);
+    await writeFile(dir, txtOf(t.name), t.text);
     t.status = "saved";
-    t.blob = null; // safely on disk
+    t.blob = null; // safely written
   } catch (e) {
     t.status = "failed";
     t.error = e.message;
   }
   drawTakes();
+  showFolder();
 }
 
 function drawTakes() {
   const el = $("#rec-takes");
   el.innerHTML = rec.list.slice().reverse().map((t) => {
     const name = esc(`${t.tr.toUpperCase()}/` + (t.name || `${t.base}-take?.${t.ext}`));
-    const info = `${fmtTime(t.secs)} · ${(t.size / 1e6).toFixed(0)} MB`;
-    const state = t.status === "saved" ? `<span class="ok">✓ Saved</span>`
+    const info = (t.secs ? `${fmtTime(t.secs)} · ` : "") + `${(t.size / 1e6).toFixed(0)} MB`;
+    const state = t.status === "saved" ? (t.where === "folder" ? `<span class="ok">✓ Saved to folder</span>` : `<span class="ok">✓ Saved in the app</span>`)
       : t.status === "saving" ? `Saving…`
       : `<span class="bad">✗ Not saved (${esc(t.error || "")})</span> <button class="small" data-save="${t.id}">Save again</button>`;
     const del = t.status === "saving" ? "" : `<button class="small" data-discard="${t.id}">${t.confirm ? "Delete it?" : "Discard"}</button>`;
@@ -576,13 +615,14 @@ async function discardSaved(t) {
   }
   if (t.status === "saved") {
     try {
-      const dir = await takeDir(t);
+      const dir = await subdir(rootOf(t.where), t.tr);
       await dir.removeEntry(t.name);
-      await dir.removeEntry(t.name.replace(/\.\w+$/, ".txt")).catch(() => {});
-    } catch (e) { t.confirm = 0; t.status = "saved"; recStatus(`Couldn't delete ${esc(t.name)}: ${esc(e.message)}`, true); drawTakes(); return false; }
+      await dir.removeEntry(txtOf(t.name)).catch(() => {});
+    } catch (e) { t.confirm = 0; recStatus(`Couldn't delete ${esc(t.name)}: ${esc(e.message)}`, true); drawTakes(); return false; }
   }
   rec.list.splice(rec.list.indexOf(t), 1);
   drawTakes();
+  showFolder();
   return true;
 }
 
@@ -628,12 +668,6 @@ function watchMic() {
 async function connectRecorder() {
   if (!navigator.mediaDevices?.getDisplayMedia || !window.CropTarget || !window.MediaRecorder) {
     recStatus("The built-in recorder needs Google Chrome.", true);
-    return;
-  }
-  // The folder comes first, on its own key press: Chrome's pickers each need a fresh one.
-  if (!rec.dir || await rec.dir.queryPermission({ mode: "readwrite" }) !== "granted") {
-    rec.dir = null;
-    if (await chooseFolder()) recStatus(`Takes will be saved in <b>${esc(rec.dir.name)}</b>. Press <b>Enter</b> to connect the recorder.`);
     return;
   }
   recStatus("Chrome is asking to share this tab: choose <b>Allow</b> (or Share).");
@@ -1076,10 +1110,17 @@ function wireControls() {
     const s = e.target.dataset.save, d = e.target.dataset.discard;
     const t = rec.list.find((x) => String(x.id) === (s || d));
     if (!t) return;
-    if (s) (rec.dir ? Promise.resolve(true) : chooseFolder()).then((ok) => ok && saveTake(t));
+    if (s) saveTake(t);
     else discardSaved(t);
   };
-  restoreFolder().then(recIdle);
+  $("#rec-folder").onclick = async (e) => {
+    const act = e.target.dataset.act;
+    if (!act || rec.recorder) return;
+    if (act === "move") return moveToFolder();
+    if (await chooseFolder(act === "change" || act === "choose")) moveToFolder();
+  };
+  restoreStorage();
+  recIdle();
   $("#mic-pick").onchange = (e) => { switchMic(e.target.value); e.target.blur(); };
   $("#btn-csv").onclick = exportCsv;
   $("#btn-txt").onclick = exportTxt;
