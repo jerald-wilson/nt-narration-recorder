@@ -28,11 +28,12 @@ Open http://localhost:8000 in Chrome or Safari. (It must be served over http; op
 4. Press **R** for the chapter's intro slide, then **Enter** to start a take. Read, pressing Space for
    each verse. Space after the last verse shows the outro slide, which leaves room for YouTube's end
    screen; the take stops itself 10 seconds later, or press **Enter** to stop sooner.
-5. Each take downloads to your Downloads folder as one video file (`MAT-5-1-full-kjv-take1.mp4`).
-   Its title and description are a **Copy description** button in the take list. A backup of every
-   take stays in the app (this browser, survives reloads) until you **Discard** it (click twice), so
-   **Download again** works if a download didn't arrive. If Chrome ever blocks downloads, allow them
-   for the site at `chrome://settings/content/automaticDownloads`.
+5. When a take stops it saves without asking anything. If you've let the app use a folder (click
+   **Save to a folder, sorted by translation** in the panel once and choose **Allow on every visit**),
+   it goes into that folder's translation subfolder (`KJV/`, `BLB/`, … following the **Reading** menu)
+   with its description `.txt`. Otherwise it downloads to Downloads as one file, and its description
+   is a **Copy description** button. A backup of every take stays in the app until you **Discard** it,
+   so **Download again** always works.
 6. Flubs: pause, re-read the sentence, keep going, and cut it later in the editor. To start over,
    press **Backspace twice**: during a take it's thrown away unsaved; between takes it deletes the
    one just finished. Either way you're back at the intro.

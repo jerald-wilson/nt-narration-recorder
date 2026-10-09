@@ -448,7 +448,7 @@ window.addEventListener("resize", () => { if (DB) checkCapture(); });
 // and stops takes. Chrome's Region Capture crops the tab to #stage, so no selection box.
 // Each take downloads when it stops, with a checked backup in the app (see "where takes are saved").
 const rec = { video: null, mic: null, recorder: null, chunks: [], started: 0, tick: 0, ctx: null, meter: 0, outroAt: 0, discardArmed: 0,
-  app: null, list: [] };
+  dir: null, app: null, list: [] };
 const REC_TYPES = ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm"];
 
 function recStatus(html, warn) {
@@ -464,12 +464,52 @@ function recIdle() {
 }
 
 // ---------- where takes are saved ----------
-// Each take downloads to Downloads as ONE file (a second download per take is what made Chrome block
-// the site's downloads). Its description is copied from the take list instead. A backup of every take
-// is also kept in the app's own storage in this browser (no permission needed, survives reloads)
-// until you discard it, so a download that didn't arrive can be fetched again.
-// Backups are grouped by translation (MSB, KJV, …), following the Reading menu.
-const subdir = (tr) => rec.app.getDirectoryHandle(tr.toUpperCase(), { create: true });
+// Recording never waits on any of this. When a take stops it goes:
+//   - into your recordings folder, in the read translation's subfolder (KJV/, BLB/, …) with its
+//     description .txt, if Chrome already allows the app to write there. You allow it once from the
+//     panel ("Allow on every visit" keeps it allowed); otherwise
+//   - to Downloads as ONE file (a second download per take is what made Chrome block the site's
+//     downloads; browsers can't put downloads in subfolders). Its description is a Copy button.
+// A backup of every take also stays in the app's own storage in this browser (no permission needed,
+// survives reloads) until you discard it, so "Download again" always works.
+function kv(mode, fn) {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open("ntr", 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("kv");
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const tx = open.result.transaction("kv", mode), req = fn(tx.objectStore("kv"));
+      tx.oncomplete = () => resolve(req.result);
+      tx.onerror = () => reject(tx.error);
+    };
+  });
+}
+// True only if Chrome lets the app write to the folder right now, without asking.
+const folderReady = async () => !!rec.dir && await rec.dir.queryPermission({ mode: "readwrite" }).catch(() => "denied") === "granted";
+// Needs a click: Chrome's one-click "allow" for the remembered folder, or its folder picker.
+async function useFolder(fresh) {
+  if (!window.showDirectoryPicker) return;
+  try {
+    let dir = fresh ? null : rec.dir;
+    if (dir && await dir.requestPermission({ mode: "readwrite" }) !== "granted") dir = null;
+    if (!dir) dir = await window.showDirectoryPicker({ id: "recordings", mode: "readwrite", startIn: "downloads" });
+    await kv("readwrite", (st) => st.put(dir, "folder"));
+    rec.dir = dir;
+  } catch { /* cancelled: takes keep downloading */ }
+  showDest();
+}
+async function showDest() {
+  const el = $("#rec-dest"), tr = C.readRow.toUpperCase();
+  if (await folderReady()) {
+    el.innerHTML = `Takes save to <b>${esc(rec.dir.name)} / ${tr}</b>, with their descriptions (follows the Reading menu) · <a data-act="change">Change folder</a>`;
+  } else {
+    el.innerHTML = `Takes download to <b>Downloads</b>. ` + (rec.dir
+      ? `<button class="small" data-act="allow">Save to ${esc(rec.dir.name)} / ${tr} instead</button>`
+      : `<button class="small" data-act="choose">Save to a folder, sorted by translation</button>`) +
+      `<br><small>When Chrome asks, choose <b>Allow on every visit</b> so it keeps saving there.</small>`;
+  }
+}
+const subdir = (tr, root = rec.app) => root.getDirectoryHandle(tr.toUpperCase(), { create: true });
 const txtOf = (name) => name.replace(/\.\w+$/, ".txt");
 async function exists(dir, name) {
   try { await dir.getFileHandle(name); return true; } catch { return false; }
@@ -496,8 +536,10 @@ function downloadBlob(name, blob) {
   setTimeout(() => URL.revokeObjectURL(a.href), 300_000); // big files can take a while to write
 }
 
-// At start-up: list the backups still kept from earlier sessions.
+// At start-up: the remembered folder, and the backups still kept from earlier sessions.
 async function restoreStorage() {
+  try { rec.dir = await kv("readonly", (st) => st.get("folder")) || null; } catch { rec.dir = null; }
+  showDest();
   try { rec.app = await navigator.storage.getDirectory(); navigator.storage.persist?.(); } catch { rec.app = null; }
   if (rec.app) {
     for await (const [tr, sub] of rec.app.entries()) {
@@ -512,12 +554,27 @@ async function restoreStorage() {
   drawTakes();
 }
 
-// A finished take: backed up in the app (checked), then downloaded.
+// A finished take: into the folder if Chrome allows it (checked), otherwise downloaded; then backed up.
 async function saveTake(t) {
   t.status = "saving";
-  if (!t.name) t.name = nextName(t);
   drawTakes();
-  downloadBlob(t.name, t.blob);
+  try {
+    if (!await folderReady()) throw new Error("no folder");
+    const dir = await subdir(t.tr, rec.dir);
+    if (!t.name) { // first free take number in the folder, so nothing is overwritten
+      let n = Math.max(1, store.get(`take.${t.base}`, 0) + 1);
+      while (await exists(dir, `${t.base}-take${n}.${t.ext}`)) n++;
+      store.set(`take.${t.base}`, n);
+      t.name = `${t.base}-take${n}.${t.ext}`;
+    }
+    await writeFile(dir, t.name, t.blob);
+    await writeFile(dir, txtOf(t.name), t.text);
+    t.dest = `${rec.dir.name}/${t.tr.toUpperCase()}`;
+  } catch {
+    if (!t.name) t.name = nextName(t);
+    t.dest = "";
+    downloadBlob(t.name, t.blob);
+  }
   try {
     if (!rec.app) throw new Error("this browser has no storage for a backup");
     const dir = await subdir(t.tr);
@@ -542,8 +599,9 @@ function drawTakes() {
   el.innerHTML = rec.list.slice().reverse().map((t) => {
     const name = esc(t.name || `${t.base}-take?.${t.ext}`);
     const info = (t.secs ? `${fmtTime(t.secs)} · ` : "") + `${(t.size / 1e6).toFixed(0)} MB` + (t.earlier ? " · earlier session" : "");
-    const state = t.status === "saved" ? (t.earlier ? `Backup kept in the app` : `<span class="ok">✓ Downloaded</span> · backup kept`)
-      : t.status === "saving" ? `Downloading and backing up…`
+    const done = t.dest ? `<span class="ok">✓ Saved to ${esc(t.dest)}</span>` : `<span class="ok">✓ Downloaded</span>`;
+    const state = t.status === "saved" ? (t.earlier ? `Backup kept in the app` : `${done} · backup kept`)
+      : t.status === "saving" ? `Saving…`
       : `<span class="bad">✗ No backup (${esc(t.error || "")})</span>`;
     const id = esc(t.id);
     const buttons = t.status === "saving" ? "" :
@@ -1059,11 +1117,16 @@ function wireControls() {
     store.set("read", C.readRow);
     buildSections();
     render();
+    showDest();
   };
   $("#btn-rec").onclick = toggleTake;
   $("#rec-takes").onclick = (e) => {
     const t = rec.list.find((x) => x.id === e.target.dataset.id);
     if (t) takeAction(e.target.dataset.act, t);
+  };
+  $("#rec-dest").onclick = (e) => {
+    const act = e.target.dataset.act;
+    if (act && !rec.recorder) useFolder(act === "change" || act === "choose");
   };
   restoreStorage();
   recIdle();
