@@ -66,12 +66,16 @@ const CONFIG = {
 
   // Metadata templates. {heading} {ref} {book} {chapter} {translation} (full name) {short} (MSB, KJV, …)
   // YouTube titles are at most titleMax characters. Each title uses the first template in its list
-  // that fits, so a long section heading drops the channel name instead of being cut off.
+  // that fits, so a long section heading drops the channel name, then the full translation name,
+  // instead of being cut off.
   // To give one translation its own wording, add e.g.  kjv: { chapter: ["…"] }  inside titles.
   titleMax: 100,
   titles: {
-    section: ["{heading} | {ref} ({short}) | Side by Side Scripture", "{heading} | {ref} ({short})"],
-    chapter: ["{book} {chapter} ({short}) | Side by Side Scripture"],
+    section: ["{heading} | {ref} - {translation} ({short}) | Side by Side Scripture",
+      "{heading} | {ref} - {translation} ({short})",
+      "{heading} | {ref} ({short}) | Side by Side Scripture",
+      "{heading} | {ref} ({short})"],
+    chapter: ["{book} {chapter} - {translation} ({short}) | Side by Side Scripture"],
   },
 
   // Attribution lines added to every description. All four are public domain.
